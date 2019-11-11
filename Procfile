@@ -1,0 +1,1 @@
+web: gunicorn onehand.wsgi --log-file -
