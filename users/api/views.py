@@ -12,10 +12,12 @@ class UserAPIView(APIView):
         serializer = UserDisplaySerializer(request.user)
         return Response(serializer.data)
 
-class ProfileAPIView(generics.ListCreateAPIView):
-    queryset = Profile.objects.all()
+class ProfileDetailAPIView(generics.RetrieveUpdateDestroyAPIView):
+    queryset = Profile
     serializer_class = ProfileDisplaySerializer
+    
+    def get_object(self):
+        return self.request.user.profile
 
-class ProfileRUDAPIVuew(generics.RetrieveUpdateDestroyAPIView):
-    queryset = Profile.objects.all()
-    serializer_class = ProfileDisplaySerializer
+    def delete(self, request, *args, **kwargs):
+        return self.request.user.delete()
