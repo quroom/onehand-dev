@@ -52,8 +52,10 @@ INSTALLED_APPS = [
     'crispy_forms',
 
     'users',
+    'questions',
 
-    'webpack_loader'    
+    'webpack_loader',
+    'multiselectfield'
 ]
 
 MIDDLEWARE = [
