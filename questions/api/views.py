@@ -28,4 +28,17 @@ class AnswerCreateAPIView(generics.CreateAPIView):
 
         if question.answers.filter(author=request_user).exists():
             raise ValidationError("You have already answered this Question!")
-        serializer.save(author=request_user, question=question)    
+        serializer.save(author=request_user, question=question)
+
+class AnswerListAPIView(generics.ListAPIView):
+    serializer_class = AnswerSerializer
+    permission_classes = [IsAuthenticated]
+
+    def get_queryset(self):
+        kwarg_pk = self.kwargs.get('pk')
+        return Answer.objects.filter(question__pk=kwarg_pk).order_by('created_at')
+
+class AnswerRUDAPIView(generics.RetrieveUpdateDestroyAPIView):
+    queryset = Answer.objects.all()
+    serializer_class = AnswerSerializer
+    permission_classes = [IsAuthenticated, IsAuthorOrReadOnly]
