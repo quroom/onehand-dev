@@ -10,6 +10,7 @@ selenium-debug.log
 onehand/__pycache__
 staticfiles
 static
+webpack-stats.json
 
 # Editor directories and files
 .idea

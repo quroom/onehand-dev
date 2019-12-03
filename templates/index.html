@@ -1,13 +1,20 @@
-{% extends "base.html" %}
 {% load render_bundle from webpack_loader %}
 
-{% block content %}
-<noscript>
-    <strong>We're sorry but frontend doesn't work properly without JavaScript enabled. Please enable it to continue.</strong>
-</noscript>
-<h1>DEV</h1>
-<div id="app"></div>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Test</title>
+</head>
+<body>
 
-<!-- built files will be auto injected -->
-{% render_bundle 'app' %}
-{% endblock %}
+    <h1>VUE JS</h1>
+
+    <div id="app">
+    </div>
+    {% render_bundle 'app' %}
+    
+</body>
+</html>
