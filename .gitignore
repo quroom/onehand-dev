@@ -19,6 +19,7 @@ webpack-stats.json
 *.ntvs*
 *.njsproj
 *.sln
+*.png
 
 # Distribution / packaging
 .Python
