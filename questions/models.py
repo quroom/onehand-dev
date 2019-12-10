@@ -2,6 +2,7 @@ from django.db import models
 from django.conf import settings
 from multiselectfield import MultiSelectField
 from datetime import datetime
+from items.models import Item
 
 ITEM_CATEGORY = (
     (1, '원룸'), (2, '투룸'), (3, '쓰리룸'), (4, '포룸'), (5, '쉐어하우스'),
@@ -24,14 +25,15 @@ class Question(models.Model):
                             null=True,
                             related_name="questions")
     item_category = MultiSelectField(choices=ITEM_CATEGORY)
-    area = models.IntegerField(default=0)
+    from_area = models.IntegerField(default=0)
     to_area = models.IntegerField(default=0)
-    location = models.CharField(max_length=100, blank=True)
+    from_location = models.CharField(max_length=100, blank=True)
+    to_location = models.CharField(max_length=100, blank=True)
     trade_category = MultiSelectField(choices=TRADE_CATEGORY)
     buying_price = models.BigIntegerField(default=0)
     deposit = models.BigIntegerField(default=0)
     monthly_fee = models.IntegerField(default=0)
-    end_date = models.DateTimeField()
+    end_date = models.DateField()
     moving_date = models.DateField()
     additional_request = models.CharField(max_length=45, blank=True)
     etc = models.TextField(blank=True)
@@ -48,4 +50,3 @@ class Answer(models.Model):
                             on_delete=models.CASCADE,
                             related_name='answers')
     body = models.TextField()
-
