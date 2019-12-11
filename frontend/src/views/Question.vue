@@ -10,11 +10,19 @@
       </p>
       <p>{{ question.created_at }}</p>
     </div>
+    <hr>
+    <div class="container">   
+      <AnswerComponent
+        v-for="(answer, index) in answers" 
+        :answer="answer"
+        :key="index"/>
+    </div>
   </div>
 </template>
 
 <script>
 import { apiService } from "../common/api.service.js";
+import AnswerComponent from "@/components/Answer.vue";
 export default {
   name: "Question",
   props: {
@@ -23,21 +31,37 @@ export default {
       required: true
     }
   },
+  components: {
+    AnswerComponent
+  },
   data() {
     return {
-      question: {}
+      question: {},
+      answers: []
     };
   },
   methods: {
+    setPageTitle(title) {
+      document.title = title;
+    },
     getQuestionData() {
       let endpoint = `/api/questions/${this.id}/`;
       apiService(endpoint).then(data => {
         this.question = data;
+        this.setPageTitle(data.etc);
+      });
+    },
+    getQuestionAnswers() {
+      let endpoint = `/api/questions/${this.id}/answers/`;
+      apiService(endpoint).then(data => {
+        this.answers = data.results;
+        console.log(this.answers)
       });
     }
   },
   created() {
     this.getQuestionData();
+    this.getQuestionAnswers()
     console.log(this.question);
   }
 };

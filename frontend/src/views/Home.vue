@@ -1,6 +1,6 @@
 <template>
   <div class="home">
-    <div class="container">
+    <div class="container mt-2">
       <table class="table">
         <thead>
           <tr>
@@ -37,6 +37,16 @@
           <hr />
         </tbody>
       </table>
+      <div class="my-4">
+        <p v-show="loadingQuestions">...로딩...</p>
+        <button
+          v-show="next"
+          @click="getQuestions"
+          class="btn btn-sm btn-outline-success"
+          >
+          Load More.
+        </button>
+      </div>
     </div>
   </div>
 </template>
@@ -47,14 +57,26 @@ export default {
   name: "home",
   data() {
     return {
-      questions: []
+      questions: [],
+      next: null,
+      loadingQuestions: false
     };
   },
   methods: {
     getQuestions() {
       let endpoint = "api/questions/";
+      if (this.next) {
+        endpoint = this.next;
+      }
+      this.loadingQuestions = true
       apiService(endpoint).then(data => {
         this.questions.push(...data.results);
+        this.loadingQuestions = false;
+        if (data.next) {
+          this.next = data.next;
+        } else {
+          this.next = null
+        }
       });
     }
   },

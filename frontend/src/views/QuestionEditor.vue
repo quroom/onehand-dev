@@ -29,6 +29,9 @@ export default {
   },
   methods: {
     onSubmit() {
+      if (!this.question_etc) {
+        this.question_etc = "빔"
+      }
       let endpoint = "/api/questions/";
       let method = "POST";
       console.log(this)

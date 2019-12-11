@@ -38,6 +38,7 @@ class AnswerListAPIView(generics.ListAPIView):
         return Answer.objects.filter(question__id=kwarg_id).order_by('created_at')
 
 class AnswerRUDAPIView(generics.RetrieveUpdateDestroyAPIView):
+    lookup_field = 'id'
     queryset = Answer.objects.all().order_by('created_at')
     serializer_class = AnswerSerializer
     permission_classes = [IsAuthenticated, IsAuthorOrReadOnly]
