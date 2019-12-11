@@ -18,7 +18,7 @@ export default {
   name: "QuestionActions",
   props: {
     id: {
-      type: Number,
+      type: [Number,String],
       required: true
     }
   },

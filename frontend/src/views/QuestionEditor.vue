@@ -17,7 +17,11 @@ import { apiService } from "../common/api.service.js";
 
 export default {
   name: "QuestionEditor",
-  props: {  
+  props: {
+    id: {
+      type: [Number,String],
+      required: false
+    }
   },
   data() {
     return {
@@ -61,11 +65,8 @@ export default {
   async beforeRouteEnter(to, from, next) {
     if (to.params.id !== undefined) {
       let endpoint = `/api/questions/${ to.params.id }/`;
-      // this.id = to.params.id;
       let data = await apiService(endpoint);
-      return next(vm => (
-        vm.question_etc = data.etc,
-        vm.id = data.id))
+      return next(vm => (vm.question_etc = data.etc))
     } else {
       return next();
     }

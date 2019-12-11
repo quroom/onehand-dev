@@ -30,7 +30,7 @@ const routes = [
     path: "/ask/:id?",
     name: "question-editor",
     component: QuestionEditor,
-    prop: true
+    props: true
   },  
   {
     path: "/answer/:id",

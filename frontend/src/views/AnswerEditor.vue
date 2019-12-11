@@ -19,7 +19,7 @@ export default {
   name: "AnswerEditor",
   props: {
     id: {
-      type: Number,
+      type: [Number,String],
       required: true
     },
     // previousAnswer: {
