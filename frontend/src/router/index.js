@@ -16,7 +16,13 @@ const routes = [
     path: "/question/:id",
     name: "question",
     component: Question,
-    props: true
+    props: (route) => {
+      const id = Number.parseInt(route.params.id, 10)
+      if (Number.isNaN(id)) {
+        return 0
+      }
+      return { id }
+    }
   },
   {
     path: "/ask",
