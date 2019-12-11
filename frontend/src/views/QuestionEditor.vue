@@ -17,6 +17,8 @@ import { apiService } from "../common/api.service.js";
 
 export default {
   name: "QuestionEditor",
+  props: {  
+  },
   data() {
     return {
       question_etc: null,
@@ -31,24 +33,41 @@ export default {
     onSubmit() {
       if (!this.question_etc) {
         this.question_etc = "빔"
-      }
-      let endpoint = "/api/questions/";
-      let method = "POST";
-      console.log(this)
-      apiService(endpoint, method, { 
-        etc: this.question_etc,
-        end_date: "2019-11-02",
-        moving_date: "2021-11-11",
-        trade_category : [1],
-        item_category : [1]
-        }).then(
-        question_data => {
-          this.$router.push({
-            name: "question",
-            params: { id: question_data.id }
-          });
+      } else {
+        let endpoint = "/api/questions/";
+        let method = "POST";
+        if (this.id !== undefined) {
+          endpoint += `${ this.id }/`;
+          method = "PUT";
         }
-      );
+        console.log(this)
+        apiService(endpoint, method, { 
+          etc: this.question_etc,
+          end_date: "2019-11-02",
+          moving_date: "2021-11-11",
+          trade_category : [1],
+          item_category : [1]
+          }).then(
+          question_data => {
+            this.$router.push({
+              name: "question",
+              params: { id: question_data.id }
+            });
+          }
+        );
+      }      
+    }
+  },
+  async beforeRouteEnter(to, from, next) {
+    if (to.params.id !== undefined) {
+      let endpoint = `/api/questions/${ to.params.id }/`;
+      // this.id = to.params.id;
+      let data = await apiService(endpoint);
+      return next(vm => (
+        vm.question_etc = data.etc,
+        vm.id = data.id))
+    } else {
+      return next();
     }
   },
   created() {

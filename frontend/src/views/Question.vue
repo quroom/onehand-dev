@@ -1,6 +1,10 @@
 <template>
   <div class="single-question mt-2">
     <div class="container">
+      <QuestionActions
+        v-if="isQuestionAuthor"
+        :id="id"
+      />
       <h1>
         {{ question.etc }}
       </h1>
@@ -56,6 +60,7 @@
 <script>
 import { apiService } from "../common/api.service.js";
 import AnswerComponent from "@/components/Answer.vue";
+import QuestionActions from "@/components/QuestionActions.vue";
 export default {
   name: "Question",
   props: {
@@ -65,7 +70,8 @@ export default {
     }
   },
   components: {
-    AnswerComponent
+    AnswerComponent,
+    QuestionActions
   },
   data() {
     return {
@@ -79,6 +85,11 @@ export default {
       loadingAnswers: false,
       requestUser: null
     };
+  },
+  computed: {
+    isQuestionAuthor() {
+      return this.question.author === this.requestUser;
+    }
   },
   methods: {
     setPageTitle(title) {

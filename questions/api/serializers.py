@@ -31,10 +31,15 @@ class QuestionSerializer(serializers.ModelSerializer):
     def get_user_has_answered(self, instance):
         request = self.context.get("request")
         return instance.answers.filter(author=request.user).exists()
+    
 
 class AnswerSerializer(serializers.ModelSerializer):
     author = serializers.StringRelatedField(read_only=True)
+    question_id = serializers.SerializerMethodField()
 
     class Meta:
         model = Answer
         exclude = ["question"]
+
+    def get_question_id(self, instance):
+        return instance.question.id
