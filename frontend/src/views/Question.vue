@@ -65,7 +65,7 @@ export default {
   name: "Question",
   props: {
     id: {
-      type: Number,
+      type: [Number,String],
       required: true
     }
   },

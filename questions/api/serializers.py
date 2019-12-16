@@ -35,6 +35,7 @@ class QuestionSerializer(serializers.ModelSerializer):
 
 class AnswerSerializer(serializers.ModelSerializer):
     author = serializers.StringRelatedField(read_only=True)
+    likes_count = serializers.SerializerMethodField(read_only=True)
     question_id = serializers.SerializerMethodField()
 
     class Meta:
@@ -43,3 +44,10 @@ class AnswerSerializer(serializers.ModelSerializer):
 
     def get_question_id(self, instance):
         return instance.question.id
+
+    def get_likes_count(self, instance):
+        return instance.voters.count()
+
+    def get_user_has_voted(self, instance):
+        request = self.context.get("request")
+        return instance.voters.filter(pk=request.user.pk).exists()

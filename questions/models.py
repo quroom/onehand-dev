@@ -48,5 +48,7 @@ class Answer(models.Model):
                             related_name="answers")
     question = models.ForeignKey(Question,
                             on_delete=models.CASCADE,
-                            related_name='answers')
+                            related_name="answers")
     body = models.TextField()
+    voters = models.ManyToManyField(settings.AUTH_USER_MODEL,
+                                    related_name="votes")
