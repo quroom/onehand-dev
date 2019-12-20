@@ -5,7 +5,7 @@ from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
-from questions.api.permissions import IsAuthorOrReadOnly
+from questions.api.permissions import IsAuthorOrReadOnly, IsQuestionAuthorOrReadOnly
 from questions.api.serializers import AnswerSerializer, QuestionSerializer
 from questions.models import Answer, Question
 
@@ -67,6 +67,37 @@ class AnswerLikeAPIView(APIView):
 
         answer.voters.add(user)
         answer.save()
+
+        serializer_context = {"request": request}
+        serializer = self.serializer_class(answer, context=serializer_context)
+
+        return Response(serializer.data, status=status.HTTP_200_OK)
+
+class AnswerAcceptAPIView(APIView):
+    serializer_class = AnswerSerializer
+    permission_class = [IsQuestionAuthorOrReadOnly]
+
+    def delete(self, request, pk):
+        answer = get_object_or_404(Answer, pk=pk)
+        answer.is_accepted = False
+        answer.save()
+        question = answer.question
+        question.is_question_done = False
+        question.save()
+
+        serializer_context = {"request": request}
+        serializer = self.serializer_class(answer, context=serializer_context)
+
+        return Response(serializer.data, status=status.HTTP_200_OK)
+
+    def post(self, request, pk):
+        answer = get_object_or_404(Answer, pk=pk)
+        if answer.question.is_question_done==True:
+            raise ValidationError("이미 답변을 채택 했습니다.")
+        answer.is_accepted = True
+        answer.save()
+        answer.question.is_question_done = True
+        answer.question.save()
 
         serializer_context = {"request": request}
         serializer = self.serializer_class(answer, context=serializer_context)

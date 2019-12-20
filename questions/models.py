@@ -20,22 +20,23 @@ TRADE_CATEGORY = (
 class Question(models.Model):
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
+    additional_request = models.CharField(max_length=45, blank=True)
     author = models.ForeignKey(settings.AUTH_USER_MODEL,
                             on_delete=models.SET_NULL,
                             null=True,
                             related_name="questions")
-    item_category = MultiSelectField(choices=ITEM_CATEGORY)
-    from_area = models.IntegerField(default=0)
-    to_area = models.IntegerField(default=0)
-    from_location = models.CharField(max_length=100, blank=True)
-    to_location = models.CharField(max_length=100, blank=True)
-    trade_category = MultiSelectField(choices=TRADE_CATEGORY)
     buying_price = models.BigIntegerField(default=0)
     deposit = models.BigIntegerField(default=0)
-    monthly_fee = models.IntegerField(default=0)
     end_date = models.DateField()
+    is_question_done = models.BooleanField(default=False)
+    item_category = MultiSelectField(choices=ITEM_CATEGORY)
+    from_area = models.IntegerField(default=0)
+    from_location = models.CharField(max_length=100, blank=True)
+    monthly_fee = models.IntegerField(default=0)
     moving_date = models.DateField()
-    additional_request = models.CharField(max_length=45, blank=True)
+    to_area = models.IntegerField(default=0)
+    to_location = models.CharField(max_length=100, blank=True)
+    trade_category = MultiSelectField(choices=TRADE_CATEGORY)
     etc = models.TextField(blank=True)
     # selected_answer = models.ForeignKey(Answer, related_name='questions')
 
@@ -46,9 +47,10 @@ class Answer(models.Model):
                             on_delete=models.SET_NULL,
                             null=True,
                             related_name="answers")
+    body = models.TextField()
+    is_accepted = models.BooleanField(default=False)
     question = models.ForeignKey(Question,
                             on_delete=models.CASCADE,
                             related_name="answers")
-    body = models.TextField()
     voters = models.ManyToManyField(settings.AUTH_USER_MODEL,
                                     related_name="votes")
