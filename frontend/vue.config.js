@@ -40,6 +40,9 @@ module.exports = {
           filename: 'bundle.css',
           chunkFilename: 'bundle.css',
         },
-    }
+    },
+    "transpileDependencies": [
+      "vuetify"
+    ]
 
 };
