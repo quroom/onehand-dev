@@ -1,10 +1,8 @@
 <template>
   <div class="single-question mt-2">
     <div class="container">
-      <QuestionActions
-        v-if="isQuestionAuthor"
-        :id="id"
-      />
+      // eslint-disable-next-line
+      <QuestionActions v-if="isQuestionAuthor" :id="id" />
       <h1>
         {{ question.etc }}
       </h1>
@@ -13,25 +11,22 @@
       </p>
       <p>{{ question.created_at }}</p>
     </div>
-    <hr>
-    <div class="container">   
+    <hr />
+    <div class="container">
       <AnswerComponent
-        v-for="(answer, index) in answers" 
+        v-for="(answer, index) in answers"
         :answer="answer"
         :requestUser="requestUser"
         :key="index"
-        @delete-answer="deleteAnswer"/>
-        <div class="my-4">
+        @delete-answer="deleteAnswer"
+      />
+      <div class="my-4">
         <p v-show="loadingAnswers">...로딩...</p>
-        <button
-          v-show="next"
-          @click="getQuestionAnswers"
-          class="btn btn-sm btn-outline-success"
-          >
+        <button v-show="next" @click="getQuestionAnswers" class="btn btn-sm btn-outline-success">
           Load More.
         </button>
       </div>
-      <hr>
+      <hr />
       <div v-if="userHasAnswered">
         <p class="answer-added">You've written an answer!</p>
       </div>
@@ -41,15 +36,23 @@
             Answer the Question
           </div>
           <div class="card-block">
-            <textarea v-model="newAnswerBody" class="form-control" placeholder="당신의 능력으로 도움을 주세요." rows="5"></textarea>
+            <textarea
+              v-model="newAnswerBody"
+              class="form-control"
+              placeholder="당신의 능력으로 도움을 주세요."
+              rows="5"
+            >
+            </textarea>
           </div>
           <div class="card-footer px-3">
-            <button type="submit" class="btn btn-sm btn-success">Submit Your Answer</button>
+            <button type="submit" class="btn btn-sm btn-success">
+              Submit Your Answer
+            </button>
           </div>
         </form>
       </div>
       <div v-else>
-        <button class="btn btn-sm btn-success" @click="showForm=true">
+        <button class="btn btn-sm btn-success" @click="showForm = true">
           Answer the Question
         </button>
       </div>
@@ -65,7 +68,7 @@ export default {
   name: "Question",
   props: {
     id: {
-      type: [Number,String],
+      type: [Number, String],
       required: true
     }
   },
@@ -108,9 +111,9 @@ export default {
     },
     getQuestionAnswers() {
       let endpoint = `/api/questions/${this.id}/answers/`;
-      this.loadingAnswers = true
+      this.loadingAnswers = true;
       if (this.next) {
-        endpoint = this.next
+        endpoint = this.next;
       }
       apiService(endpoint).then(data => {
         this.answers.push(...data.results);
@@ -118,17 +121,17 @@ export default {
         if (data.next) {
           this.next = data.next;
         } else {
-          this.next = null
+          this.next = null;
         }
-        console.log(this.answers)
+        console.log(this.answers);
       });
     },
     onSubmit() {
       if (this.newAnswerBody) {
         let endpoint = `/api/questions/${this.id}/answer/`;
-        apiService(endpoint, "POST", {body: this.newAnswerBody}).then(data => {
-          this.answers.unshift(data)
-        })
+        apiService(endpoint, "POST", { body: this.newAnswerBody }).then(data => {
+          this.answers.unshift(data);
+        });
         this.newAnswerBody = null;
         this.showForm = false;
         this.userHasAnswered = true;
@@ -136,24 +139,24 @@ export default {
           this.error = null;
         }
       } else {
-        this.error = "답변을 채워주세요."
+        this.error = "답변을 채워주세요.";
       }
     },
     async deleteAnswer(answer) {
       let endpoint = `/api/answers/${answer.id}/`;
       try {
-        await apiService(endpoint, "DELETE")
-        this.$delete(this.answers, this.answers.indexOf(answer))
-        this.userHasAnswe
+        await apiService(endpoint, "DELETE");
+        this.$delete(this.answers, this.answers.indexOf(answer));
+        this.userHasAnswered = false;
       } catch (err) {
-        console.log(err)
+        console.log(err);
       }
     }
   },
   created() {
     this.getQuestionData();
     this.getQuestionAnswers();
-    this.setRequestUser()
+    this.setRequestUser();
     console.log(this.question);
   }
 };
@@ -162,11 +165,11 @@ export default {
 <style scoped>
 .author-name {
   font-weight: bold;
-  color: #DC3545;
+  color: #dc3545;
 }
 
 .answer-added {
-  font-weight: bold
+  font-weight: bold;
 }
 
 .error {

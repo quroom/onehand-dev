@@ -1,14 +1,11 @@
 <template>
   <div class="question-actions">
     <router-link
-      :to="{name: 'question-editor', params: {id: id}}"
+      :to="{ name: 'question-editor', params: { id: id } }"
       class="btn btn-sm btn-outline-secondary mr-1"
       >Edit
     </router-link>
-    <button
-      class="btn btn-sm btn-outline-danger"
-      @click="deleteQuestion"
-    >Delete</button>
+    <button class="btn btn-sm btn-outline-danger" @click="deleteQuestion">Delete</button>
   </div>
 </template>
 
@@ -18,7 +15,7 @@ export default {
   name: "QuestionActions",
   props: {
     id: {
-      type: [Number,String],
+      type: [Number, String],
       required: true
     }
   },
@@ -26,13 +23,12 @@ export default {
     async deleteQuestion() {
       let endpoint = `/api/questions/${this.id}/`;
       try {
-        await apiService(endpoint, "DELETE")
+        await apiService(endpoint, "DELETE");
         this.$router.push("/");
-      }
-      catch (err) {
+      } catch (err) {
         console.log(err);
       }
     }
   }
-}
+};
 </script>

@@ -19,9 +19,9 @@ export default {
   name: "AnswerEditor",
   props: {
     id: {
-      type: [Number,String],
+      type: [Number, String],
       required: true
-    },
+    }
     // previousAnswer: {
     //   type: String,
     //   required: true
@@ -35,33 +35,29 @@ export default {
     return {
       answerBody: this.previousAnswer,
       error: null
-    }    
+    };
   },
   methods: {
     onSubmit() {
       if (this.answerBody) {
-        let endpoint = `/api/answers/${this.id}/`
-        apiService(endpoint, "PUT", { body: this.answerBody })
-          .then(() => {
-            this.$router.push({
-              name: "question",
-              params: {id: this.questionId}
-            })
-          })
+        let endpoint = `/api/answers/${this.id}/`;
+        apiService(endpoint, "PUT", { body: this.answerBody }).then(() => {
+          this.$router.push({
+            name: "question",
+            params: { id: this.questionId }
+          });
+        });
       } else {
-        this.error = "You can't submit an empty answer!"
+        this.error = "You can't submit an empty answer!";
       }
     }
   },
   async beforeRouteEnter(to, from, next) {
-    let endpoint = `/api/answers/${to.params.id}/`
+    let endpoint = `/api/answers/${to.params.id}/`;
     let data = await apiService(endpoint);
     // to.params.previousAnswer = data.body;
     // to.params.questionId= data.question_id;
-    return next(vm => (
-        vm.answerBody = data.body,
-        vm.questionId = data.question_id
-    ));
+    return next(vm => ((vm.answerBody = data.body), (vm.questionId = data.question_id)));
   }
-}
+};
 </script>

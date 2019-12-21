@@ -1,36 +1,26 @@
 <template>
-  <nav class="navbar navbar-expand-lg navbar-light bg-light my-navbar">
-    <div class="container">
-      <router-link :to="{ name: 'home' }" class="navbar-brand">
-        OnePaper
+  <nav>
+    <v-app-bar text>
+      <router-link :to="{ name: 'home' }">
+        <v-toolbar-title class="text-uppercase grey--text">
+          OnePaper
+        </v-toolbar-title>
       </router-link>
-      <div class="collapse navbar-collapse">
-        <ul class="navbar-nav ml-auto">
-          <li class="nav-item active">
-            <router-link
-              :to="{ name: 'home' }"
-              class="btn btn-sm btn-success">
-              홈
-            </router-link>
-          </li>
-          <li class="nav-item mx-1">
-            <router-link
-              :to="{ name: 'question-editor' }"
-              class="btn btn-sm btn-warning">
-              요청하기
-            </router-link>
-          </li>
-          <li class="nav-item">
-            <a
-              class="btn btn-sm btn-outline-secondary"
-              href="/accounts/logout/"
-            >
-              로그아웃
-            </a>
-          </li>
-        </ul>
-      </div>
-    </div>
+      <router-link :to="{ name: 'home' }">
+        <v-icon>home</v-icon>
+      </router-link>
+      <v-spacer></v-spacer>
+      <v-btn text color="grey" href="/accounts/logout/">
+        <span>로그아웃</span>
+        <v-icon>exit_to_app</v-icon>
+      </v-btn>
+    </v-app-bar>
+
+    <li class="nav-item mx-1">
+      <router-link :to="{ name: 'question-editor' }" class="btn btn-sm btn-warning">
+        요청하기
+      </router-link>
+    </li>
   </nav>
 </template>
 <script>
@@ -49,5 +39,8 @@ export default {
 }
 .navbar-brand:hover {
   color: green !important;
+}
+a {
+  text-decoration: none;
 }
 </style>

@@ -31,13 +31,13 @@ const routes = [
     name: "question-editor",
     component: QuestionEditor,
     props: true
-  },  
+  },
   {
     path: "/answer/:id",
     name: "answer-editor",
     component: AnswerEditor,
     props: true
-  },
+  }
 ];
 
 const router = new VueRouter({

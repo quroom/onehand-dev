@@ -1,7 +1,13 @@
 <template>
   <div class="home">
-    <div class="container mt-2">
-      <table class="table">
+    <v-container class="my-5">
+      <h1 class="subheading grey--text">요청 목록</h1>
+      <v-layout row wrap>
+        <v-flex xs12 sm6 md4 lg3 v-for="question in questions" :key="question.id">
+          <v-card flat class="text-xs-center ma-3"> hello </v-card>
+        </v-flex>
+      </v-layout>
+      <!-- <table class="table">
         <thead>
           <tr>
             <th scope="col">거래종류</th>
@@ -36,18 +42,14 @@
           </tr>
           <hr />
         </tbody>
-      </table>
+      </table> -->
       <div class="my-4">
         <p v-show="loadingQuestions">...로딩...</p>
-        <button
-          v-show="next"
-          @click="getQuestions"
-          class="btn btn-sm btn-outline-success"
-          >
+        <button v-show="next" @click="getQuestions" class="btn btn-sm btn-outline-success">
           Load More.
         </button>
       </div>
-    </div>
+    </v-container>
   </div>
 </template>
 
@@ -57,6 +59,15 @@ export default {
   name: "home",
   data() {
     return {
+      headers: [
+        { text: "거래종류", value: "trade_category" },
+        { text: "물건종류", value: "item_category" },
+        { text: "제목:월세가 등 입력", value: "etc" },
+        { text: "글쓴이", value: "author" },
+        { text: "응답속도", value: "average_response_time" },
+        { text: "신뢰도", value: "" },
+        { text: "등록일", value: "created_at" }
+      ],
       questions: [],
       next: null,
       loadingQuestions: false
@@ -68,14 +79,14 @@ export default {
       if (this.next) {
         endpoint = this.next;
       }
-      this.loadingQuestions = true
+      this.loadingQuestions = true;
       apiService(endpoint).then(data => {
         this.questions.push(...data.results);
         this.loadingQuestions = false;
         if (data.next) {
           this.next = data.next;
         } else {
-          this.next = null
+          this.next = null;
         }
       });
     }
@@ -88,18 +99,4 @@ export default {
 };
 </script>
 
-<style scoped>
-.answer-count {
-  background-color: #f0f0f0;
-}
-.container {
-  font-size: 12px;
-}
-.created-at {
-  font-weight: bold;
-  color: red;
-}
-.question-link {
-  color: black;
-}
-</style>
+<style scoped></style>
