@@ -1,5 +1,5 @@
 from rest_framework import fields, serializers
-from questions.models import Question, Answer, ITEM_CATEGORY, TRADE_CATEGORY
+from questions.models import Question, Answer, ITEM_CATEGORY, PROS_CATEGORY, TRADE_CATEGORY
 
 class QuestionSerializer(serializers.ModelSerializer):
     author = serializers.StringRelatedField(read_only=True)
@@ -9,8 +9,9 @@ class QuestionSerializer(serializers.ModelSerializer):
     end_date = serializers.DateField()
     moving_date = serializers.DateField()
     user_has_answered = serializers.SerializerMethodField()
-    trade_category = fields.MultipleChoiceField(choices=TRADE_CATEGORY)
-    item_category = fields.MultipleChoiceField(choices=ITEM_CATEGORY)
+    trade_category = serializers.ChoiceField(choices=TRADE_CATEGORY)
+    item_category = serializers.IntegerField()
+    pros_category = fields.MultipleChoiceField(choices=PROS_CATEGORY)
 
     class Meta:
         model = Question
