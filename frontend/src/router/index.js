@@ -1,4 +1,6 @@
 import Vue from "vue";
+import moment from "moment";
+import VueMomentJS from "vue-momentjs";
 import VueRouter from "vue-router";
 import AnswerEditor from "../views/AnswerEditor.vue";
 import Home from "../views/Home.vue";
@@ -6,6 +8,7 @@ import Question from "../views/Question.vue";
 import QuestionEditor from "../views/QuestionEditor.vue";
 
 Vue.use(VueRouter);
+Vue.use(VueMomentJS, moment);
 
 const routes = [
   {
