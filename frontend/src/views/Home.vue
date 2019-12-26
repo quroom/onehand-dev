@@ -4,9 +4,35 @@
       <h1 class="subheading grey--text">요청 목록</h1>
       <v-layout row wrap>
         <v-flex xs12 sm6 md4 lg3 v-for="question in questions" :key="question.id">
-          <v-card flat class="text-xs-center ma-3"> hello </v-card>
+          <v-card
+            class="text-xs-center ma-3"
+            flat
+            outlined
+            height="200px"
+            :to="{ name: 'question', params: { id: question.id } }"
+          >
+            <v-card-title
+              class="headline ma-1"
+            >{{ITEM_CATEGORY[question.item_category]+' '+ TRADE_CATEGORY[question.trade_category]}} ({{ question.answers_count }})</v-card-title>
+            <v-card-subtitle class="pb-1">
+              <span>{{question.to_location}}</span>
+              <span class="item_price" v-if="question.trade_category==1">{{question.buying_price}}만</span>
+              <span class="item_price" v-else-if="question.trade_category==2">{{question.deposit}}만</span>
+              <span
+                class="item_price"
+                v-else-if="question.trade_category==3"
+              >보{{question.deposit}}만 월{{question.monthly_fee}}만</span>
+            </v-card-subtitle>
+            <v-card-text class="multiline-ellipsis pt-1 pb-0">{{question.etc}}</v-card-text>
+          </v-card>
         </v-flex>
       </v-layout>
+
+      <router-link :to="{ name: 'question-editor' }">
+        <v-btn absolute dark fab mid right color="grey">
+          <v-icon>mdi-plus</v-icon>
+        </v-btn>
+      </router-link>
       <!-- <table class="table">
         <thead>
           <tr>
@@ -42,12 +68,14 @@
           </tr>
           <hr />
         </tbody>
-      </table> -->
+      </table>-->
       <div class="my-4">
         <p v-show="loadingQuestions">...로딩...</p>
-        <button v-show="next" @click="getQuestions" class="btn btn-sm btn-outline-success">
-          Load More.
-        </button>
+        <button
+          v-show="next"
+          @click="getQuestions"
+          class="btn btn-sm btn-outline-success"
+        >Load More.</button>
       </div>
     </v-container>
   </div>
@@ -55,7 +83,10 @@
 
 <script>
 import { apiService } from "../common/api.service";
+import { constants } from "@/components/mixins/constants.js";
+
 export default {
+  mixins: [constants],
   name: "home",
   data() {
     return {
@@ -99,4 +130,32 @@ export default {
 };
 </script>
 
-<style scoped></style>
+<style scoped>
+.item_price {
+  float: right;
+}
+.multiline-ellipsis {
+  overflow: hidden;
+  position: relative;
+  line-height: 20px;
+  max-height: 105px;
+  text-align: justify;
+  margin-right: -1em;
+  padding-right: 1em;
+}
+.multiline-ellipsis:before {
+  content: "...";
+  position: absolute;
+  right: 0;
+  bottom: 0;
+}
+.multiline-ellipsis:after {
+  content: "";
+  position: absolute;
+  right: 0;
+  width: 1em;
+  height: 1em;
+  margin-top: 0.2em;
+  background: white;
+}
+</style>
