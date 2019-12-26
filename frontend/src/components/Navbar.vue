@@ -15,12 +15,6 @@
         <v-icon>exit_to_app</v-icon>
       </v-btn>
     </v-app-bar>
-
-    <li class="nav-item mx-1">
-      <router-link :to="{ name: 'question-editor' }" class="btn btn-sm btn-warning">
-        요청하기
-      </router-link>
-    </li>
   </nav>
 </template>
 <script>
