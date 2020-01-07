@@ -4,45 +4,71 @@ from multiselectfield import MultiSelectField
 from datetime import datetime
 from items.models import Item
 
+#ONR / TWR / THR / FOR / SHH / OFT
+#APT / VIL / HOS / CMH /
+#STO /
+#LND
 ITEM_CATEGORY = (
-    (1, '원룸'), (2, '투룸'), (3, '쓰리룸'), (4, '포룸'), (5, '쉐어하우스'), (6, '오피스텔'),
-    (21, '아파트'), (22, '빌라'), (23, '단독주택'), (24, '상가주택'),
-    (31, '상가'),
-    (41, '토지')
+    ('ONR', '원룸'),
+    ('TWR', '투룸'),
+    ('THR', '쓰리룸'),
+    ('FOR', '포룸'),
+    ('SHH', '쉐어하우스'),
+    ('OFT', '오피스텔'),
+    ('APT', '아파트'),
+    ('VIL', '빌라'),
+    ('HOS', '단독주택'),
+    ('CMH', '상가주택'),
+    ('STO', '상가'),
+    ('LND', '토지')
+)
+#TR(TRADE) DL(Deposit Loan) RT(Rent) EX(Exchange) CS(Consulting)
+TRANSACTION_CATEGORY = (
+    ('TR', '매매'),
+    ('DL', '전세'),
+    ('RT', '월세'),
+    ('EX', '교환'),
+    ('CS', '상담')
 )
 
-TRADE_CATEGORY = (
-    (1, '매매'), (2, '전세'), (3, '월세'), (4, '교환')
-)
-
+#REB(Real Estate Brokerage) / TAX(Tax) / RGS(Registered) / LAW(Law)
+#LON(Loan) / INR(Interior) / CLN(Clean) / MOV(Move) / PRC(Pre-Check)
+#HAP(Home Appliance Purchase) / FRP(Furniture Purchase)
 PROS_CATEGORY = (
-    (1, '중개사'), (2, '세무사'), (3, '법무사'), (4, '변호사'),
-    (11, '대출'), (12, '인테리어'), (13, '청소'), (14, '이사'),
-    (21, '가전구매'), (22, '가구구매'),
+    ('REB', '중개'),
+    ('TAX', '세무'),
+    ('RES', '등기'),
+    ('LAW', '법률'),
+    ('LON', '대출'),
+    ('INR', '인테리어'),
+    ('CLN', '청소'),
+    ('MOV', '이사'),
+    ('PRC', '입주사전점검'),
+    ('HAP', '가전구매'),
+    ('FRP', '가구구매'),
 )
 
 # Create your models here.
 class Question(models.Model):
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
-    additional_request = models.CharField(max_length=45, blank=True)
     author = models.ForeignKey(settings.AUTH_USER_MODEL,
                             on_delete=models.SET_NULL,
                             null=True,
                             related_name="questions")
     trade_price = models.BigIntegerField(default=0)
     deposit = models.BigIntegerField(default=0)
-    end_date = models.DateField()
+    end_date = models.DateField(blank=True, null=True)
     is_question_done = models.BooleanField(default=False)
-    item_category = models.IntegerField(choices=ITEM_CATEGORY, default=0)
-    from_area = models.IntegerField(default=0)
+    item_category = models.CharField(max_length=3, choices=ITEM_CATEGORY, default='NA')
+    land_area = models.IntegerField(default=0)
+    building_area = models.IntegerField(default=0)
     from_location = models.CharField(max_length=100, blank=True)
     monthly_fee = models.IntegerField(default=0)
-    moving_date = models.DateField()
-    pros_category = MultiSelectField(choices=PROS_CATEGORY, default=0)
-    to_area = models.IntegerField(default=0)
+    moving_date = models.DateField(blank=True, null=True)
+    pros_category = MultiSelectField(choices=PROS_CATEGORY, default='NA')
     to_location = models.CharField(max_length=100, blank=True)
-    trade_category = models.IntegerField(choices=TRADE_CATEGORY, default=0)
+    transaction_category = models.CharField(max_length=2, choices=TRANSACTION_CATEGORY, default='NA')
     etc = models.TextField(blank=True)
     # selected_answer = models.ForeignKey(Answer, related_name='questions')
 

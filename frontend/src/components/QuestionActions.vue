@@ -1,11 +1,13 @@
 <template>
-  <div class="question-actions">
-    <router-link
-      :to="{ name: 'question-editor', params: { id: id } }"
-      class="btn btn-sm btn-outline-secondary mr-1"
-      >Edit
-    </router-link>
-    <button class="btn btn-sm btn-outline-danger" @click="deleteQuestion">Delete</button>
+  <div>
+    <v-btn text color="grey" :to="{ name: 'question-editor', params: { id: id } }">
+      <span>수정</span>
+      <v-icon>edit</v-icon>
+    </v-btn>
+    <v-btn text color="grey" @click="deleteQuestion">
+      <span>삭제</span>
+      <v-icon>delete</v-icon>
+    </v-btn>
   </div>
 </template>
 

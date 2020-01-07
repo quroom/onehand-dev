@@ -1,5 +1,5 @@
 from rest_framework import fields, serializers
-from questions.models import Question, Answer, ITEM_CATEGORY, PROS_CATEGORY, TRADE_CATEGORY
+from questions.models import Question, Answer, ITEM_CATEGORY, PROS_CATEGORY, TRANSACTION_CATEGORY
 
 class QuestionSerializer(serializers.ModelSerializer):
     author = serializers.StringRelatedField(read_only=True)
@@ -9,8 +9,8 @@ class QuestionSerializer(serializers.ModelSerializer):
     end_date = serializers.DateField()
     moving_date = serializers.DateField()
     user_has_answered = serializers.SerializerMethodField()
-    trade_category = serializers.ChoiceField(choices=TRADE_CATEGORY)
-    item_category = serializers.IntegerField()
+    transaction_category = serializers.ChoiceField(choices=TRANSACTION_CATEGORY)
+    item_category = serializers.ChoiceField(choices=ITEM_CATEGORY)
     pros_category = fields.MultipleChoiceField(choices=PROS_CATEGORY)
 
     class Meta:
@@ -20,11 +20,8 @@ class QuestionSerializer(serializers.ModelSerializer):
     def get_average_response_time(self, instance):
         return instance.author.profile.average_response_time
 
-    def get_end_date(self, instance):
-        return instance.created_at.strftime("yyyy-MM-ddThh:mm")
-
     def get_created_at(self, instance):
-        return instance.created_at.strftime("%B %d %Y")
+        return instance.created_at.strftime("%Y-%m-%d %H:%M:%S")
 
     def get_answers_count(self, instance):
         return instance.answers.count()
@@ -36,6 +33,7 @@ class QuestionSerializer(serializers.ModelSerializer):
 
 class AnswerSerializer(serializers.ModelSerializer):
     author = serializers.StringRelatedField(read_only=True)
+    created_at = serializers.SerializerMethodField()
     likes_count = serializers.SerializerMethodField(read_only=True)
     question_id = serializers.SerializerMethodField()
     user_has_voted = serializers.SerializerMethodField(read_only=True)
@@ -43,6 +41,9 @@ class AnswerSerializer(serializers.ModelSerializer):
     class Meta:
         model = Answer
         exclude = ["question", "voters", "updated_at"]
+
+    def get_created_at(self, instance):
+        return instance.created_at.strftime("%Y-%m-%d %H:%M:%S")
 
     def get_question_id(self, instance):
         return instance.question.id

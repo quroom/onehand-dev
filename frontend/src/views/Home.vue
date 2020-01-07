@@ -1,29 +1,39 @@
 <template>
   <div class="home">
     <v-container class="my-5">
-      <h1 class="subheading grey--text">요청 목록</h1>
       <v-layout row wrap>
         <v-flex xs12 sm6 md4 lg3 v-for="question in questions" :key="question.id">
           <v-card
             class="text-xs-center ma-3"
             flat
             outlined
-            height="200px"
             :to="{ name: 'question', params: { id: question.id } }"
           >
             <v-card-title
               class="headline ma-1"
-            >{{ITEM_CATEGORY[question.item_category]+' '+ TRADE_CATEGORY[question.trade_category]}} ({{ question.answers_count }})</v-card-title>
+            >{{ITEM_CATEGORY[question.item_category]+' '+ TRANSACTION_CATEGORY[question.transaction_category]}} ({{ question.answers_count }})</v-card-title>
             <v-card-subtitle class="pb-1">
               <span>{{question.to_location}}</span>
-              <span class="item_price" v-if="question.trade_category==1">{{question.buying_price}}만</span>
-              <span class="item_price" v-else-if="question.trade_category==2">{{question.deposit}}만</span>
+              <span class="item_price" v-if="question.transaction_category=='TR'">매{{question.trade_price}}원</span>
+              <span class="item_price" v-else-if="question.transaction_category=='DL'">보{{question.deposit}}원</span>
               <span
                 class="item_price"
-                v-else-if="question.trade_category==3"
-              >보{{question.deposit}}만 월{{question.monthly_fee}}만</span>
+                v-else-if="question.transaction_category=='RT'"
+              >보{{question.deposit}}원/월{{question.monthly_fee}}원</span>
             </v-card-subtitle>
             <v-card-text class="multiline-ellipsis pt-1 pb-0">{{question.etc}}</v-card-text>
+            <v-card-text>
+              <v-chip-group
+                multiple
+                column
+                dark
+                active-class="primary--text"
+              >
+                <v-chip color="green" v-for="pro in question.pros_category" :key="pro">
+                  {{ PROS_CATEGORY[pro] }}
+                </v-chip>
+              </v-chip-group>
+            </v-card-text>
           </v-card>
         </v-flex>
       </v-layout>

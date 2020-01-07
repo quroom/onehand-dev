@@ -1,62 +1,98 @@
 <template>
-  <div class="single-question mt-2">
-    <div class="container">
-      // eslint-disable-next-line
-      <QuestionActions v-if="isQuestionAuthor" :id="id" />
-      <h1>
-        {{ question.etc }}
-      </h1>
-      <p>
-        <span>{{ question.author }}</span>
-      </p>
-      <p>{{ question.created_at }}</p>
-    </div>
-    <hr />
-    <div class="container">
-      <AnswerComponent
-        v-for="(answer, index) in answers"
-        :answer="answer"
-        :requestUser="requestUser"
-        :key="index"
-        @delete-answer="deleteAnswer"
-      />
-      <div class="my-4">
-        <p v-show="loadingAnswers">...로딩...</p>
-        <button v-show="next" @click="getQuestionAnswers" class="btn btn-sm btn-outline-success">
-          Load More.
-        </button>
-      </div>
-      <hr />
-      <div v-if="userHasAnswered">
-        <p class="answer-added">You've written an answer!</p>
-      </div>
-      <div v-else-if="showForm">
-        <form class="card" @submit.prevent="onSubmit">
-          <div class="card-header px-3">
-            Answer the Question
-          </div>
-          <div class="card-block">
-            <textarea
-              v-model="newAnswerBody"
-              class="form-control"
-              placeholder="당신의 능력으로 도움을 주세요."
-              rows="5"
+  <div class="ma-5">
+    <v-container class="my-5">
+      <v-row>
+        <v-subheader>기본 정보</v-subheader>
+        <v-col class="pb-0" cols="12" xs="12" md="4">
+          <v-icon left color="blue">mdi-account</v-icon>
+          <span>{{question.author}}</span>
+          <v-chip class="ma-2" color="primary">{{ ITEM_CATEGORY[question.item_category] }}</v-chip>
+          <v-chip class="ma-2" color="primary">{{ TRANSACTION_CATEGORY[question.transaction_category] }}</v-chip>
+        </v-col>
+        <v-col class="pb-0" cols="12" xs="12" md="4">
+          <v-row align="center" style="height:100%">
+            <span>등록일: {{ question.created_at }}</span>
+          </v-row>
+        </v-col>
+        <v-col class="pb-0" cols="12" xs="12" md="4">
+          <QuestionActions v-if="isQuestionAuthor" :id="id" />
+        </v-col>
+        <v-col class="pt-0" cols="12" xs="12" md="12">
+          <v-row>
+            <v-subheader>
+              요청 업무
+            </v-subheader>
+            <v-chip-group
+              multiple
+              column
+              dark
+              active-class="primary--text"
             >
-            </textarea>
-          </div>
-          <div class="card-footer px-3">
-            <button type="submit" class="btn btn-sm btn-success">
-              Submit Your Answer
-            </button>
-          </div>
-        </form>
+              <v-chip color="green" v-for="pro in question.pros_category" :key="pro">
+                {{ PROS_CATEGORY[pro] }}
+              </v-chip>
+            </v-chip-group>
+          </v-row>
+        </v-col>
+      </v-row>
+      <v-divider></v-divider>
+      <v-row>
+        <v-col col="12" xs="1" v-if="question.transaction_category=='TR'">
+          <span>매매가: </span>
+          <span>{{question.trade_price}}원</span>
+        </v-col>
+        <v-col col="12" xs="1" v-else-if="question.transaction_category=='DL' || question.transaction_category=='RT'"></v-col>
+        <v-col col="12" xs="1" v-if="question.transaction_category=='RT'"></v-col>
+      </v-row>
+      <v-row>
+        <v-col>
+          <v-row>
+            <v-textarea label="요청사항" v-model="question.etc" auto-grow readonly></v-textarea>
+          </v-row>
+        </v-col>
+      </v-row>
+      <hr />
+      <div class="container">
+        <AnswerComponent
+          v-for="(answer, index) in answers"
+          :answer="answer"
+          :requestUser="requestUser"
+          :key="index"
+          @delete-answer="deleteAnswer"
+        />
+        <div class="my-4">
+          <p v-show="loadingAnswers">...로딩...</p>
+          <button
+            v-show="next"
+            @click="getQuestionAnswers"
+            class="btn btn-sm btn-outline-success"
+          >Load More.</button>
+        </div>
+        <hr />
+        <div v-if="userHasAnswered">
+          <p class="answer-added">You've written an answer!</p>
+        </div>
+        <div v-else-if="showForm">
+          <form class="card" @submit.prevent="onSubmit">
+            <div class="card-header px-3">Answer the Question</div>
+            <div class="card-block">
+              <textarea
+                v-model="newAnswerBody"
+                class="form-control"
+                placeholder="당신의 능력으로 도움을 주세요."
+                rows="5"
+              ></textarea>
+            </div>
+            <div class="card-footer px-3">
+              <button type="submit" class="btn btn-sm btn-success">Submit Your Answer</button>
+            </div>
+          </form>
+        </div>
+        <div v-else>
+          <button class="btn btn-sm btn-success" @click="showForm = true">Answer the Question</button>
+        </div>
       </div>
-      <div v-else>
-        <button class="btn btn-sm btn-success" @click="showForm = true">
-          Answer the Question
-        </button>
-      </div>
-    </div>
+    </v-container>
   </div>
 </template>
 
@@ -64,7 +100,10 @@
 import { apiService } from "../common/api.service.js";
 import AnswerComponent from "@/components/Answer.vue";
 import QuestionActions from "@/components/QuestionActions.vue";
+import { constants } from "@/components/mixins/constants.js";
+
 export default {
+  mixins: [constants],
   name: "Question",
   props: {
     id: {
@@ -129,9 +168,11 @@ export default {
     onSubmit() {
       if (this.newAnswerBody) {
         let endpoint = `/api/questions/${this.id}/answer/`;
-        apiService(endpoint, "POST", { body: this.newAnswerBody }).then(data => {
-          this.answers.unshift(data);
-        });
+        apiService(endpoint, "POST", { body: this.newAnswerBody }).then(
+          data => {
+            this.answers.unshift(data);
+          }
+        );
         this.newAnswerBody = null;
         this.showForm = false;
         this.userHasAnswered = true;
