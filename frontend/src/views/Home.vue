@@ -38,7 +38,7 @@
         </v-flex>
       </v-layout>
 
-      <router-link :to="{ name: 'question-editor' }">
+      <router-link v-show="is_authenticated" :to="{ name: 'question-editor' }">
         <v-btn absolute dark fab mid right color="grey">
           <v-icon>mdi-plus</v-icon>
         </v-btn>
@@ -98,6 +98,7 @@ import { constants } from "@/components/mixins/constants.js";
 export default {
   mixins: [constants],
   name: "home",
+  props: ['is_authenticated'],
   data() {
     return {
       headers: [

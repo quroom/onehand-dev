@@ -28,6 +28,8 @@ class QuestionSerializer(serializers.ModelSerializer):
 
     def get_user_has_answered(self, instance):
         request = self.context.get("request")
+        if(request.user.is_anonymous):
+            return True
         return instance.answers.filter(author=request.user).exists()
     
 

@@ -11,3 +11,12 @@ class IsQuestionAuthorOrReadOnly(permissions.BasePermission):
         if request.method in permissions.SAFE_METHODS:
             return True
         return obj.question.author == request.user
+
+class IsAuthenticatedOrListOnly(permissions.BasePermission):
+    def has_permission(self, request, view):
+        if not request.user.is_authenticated:
+            if view.action == 'list':
+                return True
+            return False
+        else:
+            return True

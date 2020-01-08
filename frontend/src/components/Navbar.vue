@@ -10,8 +10,12 @@
         <v-icon>home</v-icon>
       </router-link>
       <v-spacer></v-spacer>
-      <v-btn text color="grey" href="/accounts/logout/">
+      <v-btn v-show="is_authenticated" text color="grey" href="/accounts/logout/">
         <span>로그아웃</span>
+        <v-icon>exit_to_app</v-icon>
+      </v-btn>
+      <v-btn v-show="!is_authenticated" text color="grey" href="/accounts/login/">
+        <span>로그인</span>
         <v-icon>exit_to_app</v-icon>
       </v-btn>
     </v-app-bar>
@@ -19,7 +23,8 @@
 </template>
 <script>
 export default {
-  name: "NavbarComponent"
+  name: "NavbarComponent",
+  props: ['is_authenticated']
 };
 </script>
 

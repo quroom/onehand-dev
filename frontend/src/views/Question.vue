@@ -106,6 +106,7 @@ export default {
   mixins: [constants],
   name: "Question",
   props: {
+    is_authenticated:{},
     id: {
       type: [Number, String],
       required: true
@@ -195,10 +196,14 @@ export default {
     }
   },
   created() {
-    this.getQuestionData();
-    this.getQuestionAnswers();
-    this.setRequestUser();
-    console.log(this.question);
+    if(!this.is_authenticated){
+      window.location.href='/accounts/login/'
+    }else{
+      this.getQuestionData();
+      this.getQuestionAnswers();
+      this.setRequestUser();
+      console.log(this.question);
+    }
   }
 };
 </script>
