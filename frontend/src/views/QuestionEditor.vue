@@ -45,7 +45,11 @@
         </v-row>
         <div class="subtitle">부동산 조건 정보</div>
         <v-row>
-          <v-col cols="12" sm="3" md="2">
+          <v-col
+            v-show="!multiIncludes(item_category, ['LND'])"
+            cols="12"
+            sm="3"
+            md="2">
             <v-text-field v-model="building_area" label="건물면적(㎡)"></v-text-field>
           </v-col>
           <v-col
@@ -73,45 +77,100 @@
         </v-row>
         <div class="subtitle">위치 및 일정 정보</div>
         <v-row outline>
-          <v-col v-show="multiIncludes(pros_category, ['MOV'])" cols="12" sm="6" md="3">
-            <v-btn color="green" dark @click.stop="dialog = true">현재(출발) 주소 검색</v-btn>
-            <v-dialog v-model="dialog">
+          <v-col v-show="multiIncludes(pros_category, ['MOV'])" cols="12" sm="12" md="6">
+            <v-text-field
+              v-model="dep.full_address"
+              label="출발 주소 검색"
+              outlined
+              readonly
+              @click.stop="dep.dialog = true"
+            ></v-text-field>
+            <v-dialog v-model="dep.dialog" :key="dep.daumpostcodeKey">
               <v-card>
-                <v-card-text>
-                  <DaumPostcode :on-complete="handleAddress" />
+                <v-card-text class="pt-5">
+                  <vue-daum-postcode v-if="dep.daumpostcodeKey%2==0" @complete="dep.address_objects = $event; dep.address = dep.address_objects.jibunAddress + ' ' + dep.address_objects.buildingName; dep.extra_address=''; dep.daumpostcodeKey+=1"/>
+                  <v-row v-else>
+                    <v-col class="pa-0" cols="12" sm="4">
+                      <v-text-field :value="this.dep.address_objects.zonecode" label="우편번호" outlined readonly></v-text-field>
+                    </v-col>
+                    <v-col class="pa-0" cols="12" lg="12">
+                      <v-text-field v-model="dep.address" outlined></v-text-field>
+                    </v-col>
+                    <v-text-field
+                      label="나머지 주소 입력"
+                      v-model="dep.extra_address"
+                      outlined
+                    ></v-text-field>
+                    <v-btn @click.prevent="onSubmitAddress(1)">확인</v-btn>
+                  </v-row>
                 </v-card-text>
               </v-card>
             </v-dialog>
           </v-col>
           <v-col
-            v-show="multiIncludes(pros_category, ['REB', 'TAX','RES','LAW','INR','CLN', 'MOV', 'PRC'])"
+            v-show="multiIncludes(pros_category, ['REB','TAX','RES','LAW','INR','CLN', 'MOV', 'PRC'])"
             cols="12"
-            sm="6"
-            md="3"
+            sm="12"
+            md="6"
           >
-            <v-btn
-              v-if="multiIncludes(pros_category, ['REB'])"
-              color="green"
-              dark
-              outline
-              @click.stop="dialog = true"
-            >대상 지역 검색</v-btn>
-            <v-btn
-              v-else-if="multiIncludes(pros_category, ['MOV'])"
-              color="green"
-              dark
-              @click.stop="dialog = true"
-            >대상(도착) 주소 검색</v-btn>
-            <v-btn
+            <v-text-field
+              v-if="multiIncludes(pros_category, ['MOV'])"
+              v-model="arv.full_address"
+              label="대상(도착) 주소 검색"
+              outlined
+              readonly
+              @click.stop="arv.dialog = true"
+            ></v-text-field>
+            <v-text-field
               v-else-if="multiIncludes(pros_category, ['TAX','RES','LAW','INR','CLN', 'PRC'])"
-              color="green"
-              dark
-              @click.stop="dialog = true"
-            >대상 주소 검색</v-btn>
-            <v-dialog v-model="dialog">
+              v-model="arv.full_address"
+              label="대상 주소 검색"
+              outlined
+              readonly
+              @click.stop="arv.dialog = true"
+            ></v-text-field>
+            <v-text-field
+              v-else
+              v-model="arv.address"
+              label="입주 희망 지역 검색"
+              outlined
+              readonly
+              @click.stop="arv.dialog = true"
+            ></v-text-field>
+            <v-dialog v-model="arv.dialog" :key="arv.daumpostcodeKey">
               <v-card>
-                <v-card-text>
-                  <DaumPostcode :on-complete="handleAddress" />
+                <v-card-text v-if="multiIncludes(pros_category, ['REB'])" class="pt-5">
+                  <v-row>
+                    <v-col cols="12" xs="12" md="3">
+                      <v-select label="시도"></v-select>
+                    </v-col>
+                    <v-col cols="12" xs="12" md="3">
+                      <v-select label="시군구"></v-select>
+                    </v-col>
+                    <v-col cols="12" xs="12" md="3">
+                      <v-select label="읍면동"></v-select>
+                    </v-col>
+                    <v-col v-if="multiIncludes(pros_category, ['MOV'])" cols="12" xs="12" md="3">
+                      <v-select label="층"></v-select>
+                    </v-col>
+                  </v-row>
+                </v-card-text>
+                <v-card-text v-else class="pt-5">
+                  <vue-daum-postcode v-if="arv.daumpostcodeKey%2==0" @complete="arv.address_objects = $event; arv.address = arv.address_objects.jibunAddress + ' ' + arv.address_objects.buildingName; arv.extra_address=''; arv.daumpostcodeKey+=1"/>
+                  <v-row v-else>
+                    <v-col class="pa-0" cols="12" sm="4">
+                      <v-text-field :value="this.arv.address_objects.zonecode" label="우편번호" outlined readonly></v-text-field>
+                    </v-col>
+                    <v-col class="pa-0" cols="12" lg="12">
+                      <v-text-field v-model="arv.address" outlined></v-text-field>
+                    </v-col>
+                    <v-text-field
+                      label="나머지 주소 입력"
+                      v-model="arv.extra_address"
+                      outlined
+                    ></v-text-field>
+                    <v-btn @click.prevent="onSubmitAddress(2)">확인</v-btn>
+                  </v-row>
                 </v-card-text>
               </v-card>
             </v-dialog>
@@ -147,7 +206,7 @@
           v-model="etc"
           class="form-control mt-5"
           :label="$t('message.etc')"
-          placeholder="요청시 필요한 사항을 추가로 입력 해주세요."
+          placeholder="요청시 상세한 사항을 추가로 입력 해주세요. (입주 희망 아파트명, 세부지역, 세부조건 등)"
           auto-grow
           outlined
         ></v-textarea>
@@ -159,14 +218,11 @@
 <script>
 import { apiService } from "../common/api.service.js";
 import { constants } from "@/components/mixins/constants.js";
-import DaumPostcode from "vuejs-daum-postcode";
+// import VueDaumPostcode from "vue-daum-postcode"
 
 export default {
   mixins: [constants],
   name: "QuestionEditor",
-  components: {
-    DaumPostcode
-  },
   props: {
     id: {
       type: [Number, String],
@@ -175,11 +231,24 @@ export default {
   },
   data() {
     return {
+      arv:{
+        daumpostcodeKey:0,
+        address_objects: "",
+        full_address:"",
+        address:"",
+        extra_address: "",
+        dialog: false,
+      },
+      dep:{
+        daumpostcodeKey:0,
+        address_objects: "",
+        full_address:"",
+        address:"",
+        extra_address: "",
+        dialog: false,
+      },
       menu: false,
       item_category_list: [],
-      fullAddress: "",
-      extraAddress: "",
-      dialog: false,
       land_area: 0,
       building_area: 0,
       trade_price: 0,
@@ -190,7 +259,7 @@ export default {
       moving_date: null,
       item_category: null,
       transaction_category: null,
-      pros_category: ["REB"],
+      pros_category: ["REB", "MOV"],
       error: null,
       moment: null
     };
@@ -227,23 +296,38 @@ export default {
       }
     },
     handleAddress(data) {
-      this.fullAddress = data.address;
-      this.extraAddress = "";
-      if (data.addressType === "R") {
-        if (data.bname !== "") {
-          this.extraAddress += data.bname;
-        }
-        if (data.buildingName !== "") {
-          this.extraAddress +=
-            this.extraAddress !== ""
-              ? `, ${data.buildingName}`
-              : data.buildingName;
-        }
-        this.fullAddress +=
-          this.extraAddress !== "" ? ` (${this.extraAddress})` : "";
-      }
+      // this.fullAddress = data.address;
+      // this.extraAddress = "";
+      // if (data.addressType === "R") {
+      //   if (data.bname !== "") {
+      //     this.extraAddress += data.bname;
+      //   }
+      //   if (data.buildingName !== "") {
+      //     this.extraAddress +=
+      //       this.extraAddress !== ""
+      //         ? `, ${data.buildingName}`
+      //         : data.buildingName;
+      //   }
+      //   this.fullAddress +=
+      //     this.extraAddress !== "" ? ` (${this.extraAddress})` : "";
+      // }
 
-      console.log(this.fullAddress); // e.g. '서울 성동구 왕십리로2길 20 (성수동1가)'
+      console.log(data); // e.g. '서울 성동구 왕십리로2길 20 (성수동1가)'
+      // this.dialog=false
+    },
+    onSubmitAddress(flag) {
+      //1:Departure address. 2:Arriving address. 3:Departure address partially.
+      if(flag==1){
+        this.dep.full_address = this.dep.address + " " + this.dep.extra_address
+        this.dep.dialog = false
+        this.dep.daumpostcodeKey+=1      
+      } else if(flag==2) {
+        this.arv.full_address = this.arv.address + " " + this.arv.extra_address
+        this.arv.dialog = false
+        this.arv.daumpostcodeKey+=1
+      } else {
+        console.log('3')
+      }
     },
     onSubmit() {
       if (!this.etc) {
@@ -305,9 +389,6 @@ export default {
     // this.moving_date ='1900-01-01'
     this.end_date = this.$moment()
       .add(7, "days")
-      .format("YYYY-MM-DD");
-    this.moving_date = this.$moment()
-      .add(1, "months")
       .format("YYYY-MM-DD");
   }
 };

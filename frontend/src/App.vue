@@ -1,7 +1,7 @@
 <template>
   <v-app>
-    <NavbarComponent :is_authenticated="is_authenticated" />
-    <router-view :is_authenticated="is_authenticated" />
+    <NavbarComponent />
+    <router-view />
   </v-app>
 </template>
 
@@ -14,21 +14,13 @@ export default {
   components: {
     NavbarComponent
   },
-  data() {
-    return {
-      is_authenticated:false
-    }
-  },
   methods: {
     async setUserInfo() {
       const data = await apiService("/api/user/");
       const requestUser = data["username"];
-      const is_authenticated = data["is_authenticated"];
       window.localStorage.setItem("username", requestUser);
-      this.is_authenticated=is_authenticated
       console.log(data);
       console.log(requestUser);
-      console.log(is_authenticated);
     }
   },
   created() {

@@ -31,7 +31,6 @@ class QuestionSerializer(serializers.ModelSerializer):
         if(request.user.is_anonymous):
             return True
         return instance.answers.filter(author=request.user).exists()
-    
 
 class AnswerSerializer(serializers.ModelSerializer):
     author = serializers.StringRelatedField(read_only=True)

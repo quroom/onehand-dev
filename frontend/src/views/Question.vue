@@ -2,52 +2,78 @@
   <div class="ma-5">
     <v-container class="my-5">
       <v-row>
-        <v-subheader>기본 정보</v-subheader>
         <v-col class="pb-0" cols="12" xs="12" md="4">
           <v-icon left color="blue">mdi-account</v-icon>
           <span>{{question.author}}</span>
-          <v-chip class="ma-2" color="primary">{{ ITEM_CATEGORY[question.item_category] }}</v-chip>
-          <v-chip class="ma-2" color="primary">{{ TRANSACTION_CATEGORY[question.transaction_category] }}</v-chip>
         </v-col>
         <v-col class="pb-0" cols="12" xs="12" md="4">
           <v-row align="center" style="height:100%">
             <span>등록일: {{ question.created_at }}</span>
           </v-row>
         </v-col>
-        <v-col class="pb-0" cols="12" xs="12" md="4">
-          <QuestionActions v-if="isQuestionAuthor" :id="id" />
-        </v-col>
         <v-col class="pt-0" cols="12" xs="12" md="12">
           <v-row>
             <v-subheader>
-              요청 업무
+              필요업무
             </v-subheader>
-            <v-chip-group
-              multiple
-              column
-              dark
-              active-class="primary--text"
-            >
-              <v-chip color="green" v-for="pro in question.pros_category" :key="pro">
+            <div class="mt-2">
+              <v-chip class="mr-2" color="green" text-color="white" v-for="pro in question.pros_category" :key="pro">
                 {{ PROS_CATEGORY[pro] }}
               </v-chip>
-            </v-chip-group>
+            </div>
+            <v-subheader class="ml-4">
+              물건정보
+            </v-subheader>
+            <v-chip class="mt-2" color="primary">{{ ITEM_CATEGORY[question.item_category] }}</v-chip>
+            <v-chip class="mt-2 ml-2" color="primary">{{ TRANSACTION_CATEGORY[question.transaction_category] }}</v-chip>
           </v-row>
         </v-col>
       </v-row>
       <v-divider></v-divider>
+      <div class="subtitle mt-5">부동산 조건 정보</div>
       <v-row>
-        <v-col col="12" xs="1" v-if="question.transaction_category=='TR'">
-          <span>매매가: </span>
-          <span>{{question.trade_price}}원</span>
+        <v-col
+            v-show="!multiIncludes(question.item_category, ['LND'])"
+            cols="12"
+            sm="3"
+            md="2">
+            <v-text-field v-model="question.building_area" label="건물면적(㎡)" readonly></v-text-field>
+          </v-col>
+          <v-col
+            v-show=" multiIncludes(question.item_category, ['LND']) || (question.transaction_category=='TR' && multiIncludes(item_category, ['ONR','HOS','CMH','LND'])) "
+            cols="12"
+            sm="3"
+            md="2"
+          >
+            <v-text-field v-model="question.land_area" label="토지면적(㎡)" readonly></v-text-field>
+          </v-col>
+          <v-col v-if="question.transaction_category=='TR'" cols="12" sm="3" md="2">
+            <v-text-field v-model="question.trade_price" label="매매가" readonly></v-text-field>
+          </v-col>
+          <v-col
+            v-else-if="question.transaction_category=='DL' || question.transaction_category=='RT'"
+            cols="12"
+            sm="3"
+            md="2"
+          >
+            <v-text-field v-model="question.deposit" label="보증금" readonly></v-text-field>
+          </v-col>
+          <v-col v-if="question.transaction_category=='RT'" cols="12" sm="3" md="2" readonly>
+            <v-text-field v-model="question.monthly_fee" label="월세*" readonly></v-text-field>
+          </v-col>
+      </v-row>
+      <div class="subtitle">위치 및 일정 정보</div>
+      <v-row outline>
+      </v-row>
+      <v-row class="mb-0">
+        <v-col class="pb-0" cols="12">
+          <v-textarea label="기타요청사항" v-model="question.etc" auto-grow outlined readonly></v-textarea>
         </v-col>
-        <v-col col="12" xs="1" v-else-if="question.transaction_category=='DL' || question.transaction_category=='RT'"></v-col>
-        <v-col col="12" xs="1" v-if="question.transaction_category=='RT'"></v-col>
       </v-row>
       <v-row>
-        <v-col>
-          <v-row>
-            <v-textarea label="요청사항" v-model="question.etc" auto-grow readonly></v-textarea>
+        <v-col class="pt-0" cols="12">
+          <v-row justify="end">
+            <QuestionActions v-if="isQuestionAuthor" :id="id" />
           </v-row>
         </v-col>
       </v-row>
@@ -101,12 +127,11 @@ import { apiService } from "../common/api.service.js";
 import AnswerComponent from "@/components/Answer.vue";
 import QuestionActions from "@/components/QuestionActions.vue";
 import { constants } from "@/components/mixins/constants.js";
-
+import { getCookie } from "../common/get_cookie.js"
 export default {
   mixins: [constants],
   name: "Question",
   props: {
-    is_authenticated:{},
     id: {
       type: [Number, String],
       required: true
@@ -126,7 +151,7 @@ export default {
       showForm: false,
       next: null,
       loadingAnswers: false,
-      requestUser: null
+      requestUser: null,
     };
   },
   computed: {
@@ -135,6 +160,23 @@ export default {
     }
   },
   methods: {
+    multiIncludes(selected_category, condition_category) {
+      if (Array.isArray(selected_category)) {
+        for (let value of selected_category) {
+          if (condition_category.includes(value)) {
+            return true;
+          }
+        }
+      } else {
+        for (let value of condition_category) {
+          if (selected_category == value) {
+            return true;
+          }
+        }
+      }
+      return false;
+    },
+    getCookie:getCookie,
     setPageTitle(title) {
       document.title = title;
     },
@@ -196,7 +238,7 @@ export default {
     }
   },
   created() {
-    if(!this.is_authenticated){
+    if(!getCookie('islogin')){
       window.location.href='/accounts/login/'
     }else{
       this.getQuestionData();

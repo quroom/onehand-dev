@@ -38,7 +38,7 @@
         </v-flex>
       </v-layout>
 
-      <router-link v-show="is_authenticated" :to="{ name: 'question-editor' }">
+      <router-link v-show="getCookie('islogin')" :to="{ name: 'question-editor' }">
         <v-btn absolute dark fab mid right color="grey">
           <v-icon>mdi-plus</v-icon>
         </v-btn>
@@ -94,11 +94,11 @@
 <script>
 import { apiService } from "../common/api.service";
 import { constants } from "@/components/mixins/constants.js";
+import { getCookie } from "@/common/get_cookie.js";
 
 export default {
   mixins: [constants],
   name: "home",
-  props: ['is_authenticated'],
   data() {
     return {
       headers: [
@@ -112,10 +112,11 @@ export default {
       ],
       questions: [],
       next: null,
-      loadingQuestions: false
+      loadingQuestions: false,
     };
   },
   methods: {
+    getCookie:getCookie,
     getQuestions() {
       let endpoint = "api/questions/";
       if (this.next) {

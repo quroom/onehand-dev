@@ -15,6 +15,6 @@ function getCookie(name) {
   }
   return cookieValue;
 }
-var CRSF_TOKEN = getCookie('csrftoken');
+var CSRF_TOKEN = getCookie('csrftoken');
 
-export { CRSF_TOKEN };
+export { CSRF_TOKEN };

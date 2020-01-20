@@ -28,7 +28,7 @@ class Profile(models.Model):
     bank_name = models.CharField(max_length=45, blank=True)
     account_number = models.CharField(max_length=45, blank=True)
     point = models.IntegerField(default=0)
-    category = models.IntegerField(default=1)
+    category = models.IntegerField(default=0)
     ip_address = models.GenericIPAddressField(null=True)
     average_response_time = models.FloatField(default=0)
     response_rate = models.FloatField(default=0)
@@ -37,7 +37,10 @@ class Profile(models.Model):
 @receiver(post_save, sender=CustomUser)
 def create_user_profile(sender, instance, created, **kwargs):
     if created:
-        Profile.objects.create(user=instance)
+        if user.is_staff:
+            Profile.objects.create(user=instance, category=1)
+        else:
+            Profile.objects.create(user=instance)
 
 @receiver(post_save, sender=CustomUser)
 def save_user_profile(sender, instance, **kwargs):
