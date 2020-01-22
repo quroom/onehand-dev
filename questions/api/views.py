@@ -1,3 +1,4 @@
+from django.http import JsonResponse, HttpResponse
 from rest_framework import generics, status, viewsets
 from rest_framework.exceptions import ValidationError
 from rest_framework.generics import get_object_or_404
@@ -8,6 +9,25 @@ from rest_framework.views import APIView
 from questions.api.permissions import IsAuthorOrReadOnly, IsQuestionAuthorOrReadOnly, IsAuthenticatedOrQuestionListOnly
 from questions.api.serializers import AnswerSerializer, QuestionSerializer
 from questions.models import Answer, Question
+
+import requests
+
+def locationList(request, cmd, sidocode='None', sigungucode=''):
+    base_url = "http://openapi.epost.go.kr/postal/retrieveLotNumberAdressAreaCdService/retrieveLotNumberAdressAreaCdService/"
+    service_key = "zBR3IIhs2wZyfk5Z%2B89R%2BylLx6Tctaa7bKH9wyL9CXJUOguzrHlOFB0G2%2BQYEqpgrdy0RCYEro7jjqrthW5LoQ%3D%3D"
+    if cmd == "sido":
+        url = base_url + 'getBorodCityList' + "?ServiceKey=" + service_key
+    elif cmd == "sigungu":
+        url = base_url + 'getSiGunGuList' + "?ServiceKey=" + service_key + "&brtcCd=" + sidocode
+    elif cmd == "eupmyundong":
+        url = base_url + 'getEupMyunDongList' + "?ServiceKey=" + service_key + "&brtcCd=" + sidocode + "&signguCd=" + sigungucode
+        
+
+    response = requests.get(url)
+    if response.status_code != 200:
+        return HttpResponse(response.reason, status=response.status_code)
+    else:
+        return HttpResponse(response.text, status=status.HTTP_200_OK)
 
 class QuestionViewSet(viewsets.ModelViewSet):
     queryset = Question.objects.all().order_by("-created_at")

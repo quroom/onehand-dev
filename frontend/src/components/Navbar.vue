@@ -18,6 +18,9 @@
         <span>로그인</span>
         <v-icon>exit_to_app</v-icon>
       </v-btn>
+      <v-btn @click="switchLoc()">
+        {{this.$i18n.locale === 'en' ? '한글' : 'English'}}
+      </v-btn>
     </v-app-bar>
   </nav>
 </template>
@@ -30,7 +33,11 @@ export default {
     removeCookie: function () {
       // document.cookie = 'csrftoken= ; expires = Thu, 01 Jan 1970 00:00:00 GMT'
     },
-    getCookie: getCookie
+    getCookie: getCookie,
+    switchLoc(){
+      this.$i18n.locale = this.$i18n.locale === 'en' ? 'ko' : 'en';
+      this.$refs.form.validate();
+    },
   }
 };
 </script>

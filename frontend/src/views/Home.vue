@@ -118,7 +118,7 @@ export default {
   methods: {
     getCookie:getCookie,
     getQuestions() {
-      let endpoint = "api/questions/";
+      let endpoint = "/api/questions/";
       if (this.next) {
         endpoint = this.next;
       }

@@ -1,223 +1,288 @@
 <template>
+  <ValidationObserver ref="obs" v-slot="{ invalid, validated, passes, validate }">
   <div class="ma-5">
+    <div class="headline mb-10 ml-5">집구하기 부터 이사까지 한번에!</div>
+    <v-stepper
+      v-model="e1"
+    >
+      <v-stepper-header>
+        <v-stepper-step
+          key="0-step"
+          :step="0"
+          :editable="true"
+          :complete="e1>0"
+        >
+          {{$t('basic')}}
+        </v-stepper-step>
+        <template v-for="(key, index) in pros_category">        
+        <v-stepper-step
+          :key="`${index+1}-step`"
+          :step="index+1"
+          :complete="e1>index+1"
+          :editable="true"
+        >
+          {{PROS_CATEGORY[key]}}
+        </v-stepper-step>
+        </template>
+      </v-stepper-header>
+      <v-stepper-items>
+        <v-stepper-content
+          :key="`0-content`"
+          :step="0"
+        >
+          <v-card
+            class="mx-auto"
+            outlined
+          >
+            <div class="subtitle">{{$t('basic')}} {{$t('info')}}</div>
+            <v-row>
+              <v-col cols="12" sm="12" md="6">
+                <ValidationProvider rules="required" v-slot="{ errors, valid }">
+                  <v-autocomplete
+                    @change="prosChange"
+                    v-model="pros_category"
+                    :items="PROS_CATEGORY_LIST"
+                    multiple
+                    chips
+                    deletable-chips
+                    @input="searchInput=null"
+                    :search-input.sync="searchInput"
+                    label="필요업무(중개,법무사,가구구매 등)*"
+                    :error-messages="errors"
+                    :success="valid"
+                  ></v-autocomplete>
+                </ValidationProvider>
+              </v-col>              
+              <v-col cols="12" sm="6" md="3">
+                <ValidationProvider rules="required" v-slot="{ errors, valid }">
+                  <v-autocomplete
+                    v-model="item_category"
+                    :items="ITEM_CATEGORY_LIST"
+                    item-text="text"
+                    item-value="value"
+                    chips
+                    label="물건종류(원룸,아파트,주택 등)*"
+                    :error-messages="errors"
+                    :success="valid"
+                  ></v-autocomplete>
+                </ValidationProvider>
+              </v-col>
+            </v-row>
+            <v-row class="ma-0" justify="end">
+              <v-btn
+                class="ma-2"
+                @click="validate(); nextStep(0);"
+              >{{$t('next')}}</v-btn>
+            </v-row>
+          </v-card>
+        </v-stepper-content>
+
+        <template v-for="(key, index) in pros_category">        
+          <v-stepper-content
+            :key="`${index+1}-content`"
+            :step="index+1"
+          >
+            <v-card
+              class="mx-auto"
+              outlined
+              v-if="key=='REB'">
+              <div class="subtitle-1">{{$t('realestate')}} {{$t('info')}}</div>
+              <v-row>
+                <v-col
+                v-show="multiIncludes(pros_category, ['REB','TAX','RES','LAW'])"
+                cols="12"
+                sm="3"
+                md="3"
+                >
+                <ValidationProvider :name="$t('transaction_category')" rules="required" v-slot="{ errors, valid }">                
+                  <v-autocomplete                    
+                    v-model="transaction_category"
+                    :items="TRANSACTION_CATEGORY_LIST"
+                    item-text="text"
+                    item-value="value"
+                    chips
+                    :label="$t('transaction_category')"
+                    :error-messages="errors"
+                    :success="valid"
+                  ></v-autocomplete>
+                </ValidationProvider>
+                </v-col>
+                <v-col
+                  v-show="!multiIncludes(item_category, ['LND'])"
+                  cols="12"
+                  sm="3"
+                  md="2">
+                <ValidationProvider name="건물면적" rules="integer" v-slot="{ errors, valid }">
+                  <v-text-field
+                    v-model="building_area"
+                    label="건물면적(㎡)"
+                    :error-messages="errors"
+                    :success="valid"
+                  >
+                  </v-text-field>
+                </ValidationProvider>
+                </v-col>
+                <v-col
+                  v-show=" multiIncludes(item_category, ['LND']) || (transaction_category=='TR' && multiIncludes(item_category, ['ONR','HOS','CMH','LND'])) "
+                  cols="12"
+                  sm="3"
+                  md="2"
+                >
+                  <v-text-field v-model="land_area" label="토지면적(㎡)"></v-text-field>
+                </v-col>
+                <v-col v-if="transaction_category=='TR'" cols="12" sm="3" md="2">
+                  <v-text-field v-model="trade_price" label="매매가"></v-text-field>
+                </v-col>
+                <v-col
+                  v-else-if="transaction_category=='DL' || transaction_category=='RT'"
+                  cols="12"
+                  sm="3"
+                  md="2"
+                >
+                  <v-text-field v-model="deposit" label="보증금" required></v-text-field>
+                </v-col>
+                <v-col v-if="transaction_category=='RT'" cols="12" sm="3" md="2">
+                  <v-text-field v-model="monthly_fee" label="월세*" required></v-text-field>
+                </v-col>
+                <v-col col="12" sm="6" md="3">
+                  <v-menu
+                    v-model="cal_menu"
+                    :close-on-content-click="false"
+                    :nudge-right="40"
+                    transition="scale-transition"
+                    offset-y
+                    min-width="290px"
+                  >
+                    <template v-slot:activator="{on}">
+                      <v-text-field
+                        v-model="moving_date"
+                        label="희망 입주일"
+                        prepend-icon="event"
+                        readonly
+                        v-on="on"
+                      ></v-text-field>
+                    </template>
+                    <v-date-picker
+                      :day-format="date=>date.split('-')[2]"
+                      locale="kr"
+                      v-model="moving_date"
+                      @input="cal_menu=false"
+                    ></v-date-picker>
+                  </v-menu>
+                </v-col>
+              </v-row>
+              <v-row align="center">
+                <v-col cols="12" sm="12" md="8">
+                  <AddressSearchComponent label="주소 검색" :button="true" :address.sync="arv.address_objects"></AddressSearchComponent>
+                </v-col>
+              </v-row>
+              <v-row>
+                <v-col cols="12" xs="12">
+                  <v-textarea
+                    v-model="etc"
+                    class="form-control"
+                    :label="$t('etc')"
+                    placeholder="요청 시 상세한 사항을 추가로 입력 해주세요. (입주 희망 아파트명, 세부지역, 세부조건 등)"
+                    auto-grow
+                    outlined
+                  ></v-textarea>
+                </v-col>
+              </v-row>
+            </v-card>
+            <v-card
+              class="mx-auto"
+              outlined
+              v-else-if="key=='MOV'"
+            >
+              <div class="subtitle-1">이사 정보</div>
+              <v-row>
+                <v-col                
+                  cols="12"
+                  sm="3"
+                  md="2">
+                  <v-text-field
+                    v-model="building_area"
+                    label="출발지 건물 면적(㎡)"
+                    hide-details="auto"
+                  >
+                  </v-text-field>
+                </v-col>
+                <v-col                
+                  cols="12"
+                  sm="3"
+                  md="2">
+                  <v-text-field
+                    v-model="building_area"
+                    label="도착지 건물 면적(㎡)"
+                    hide-details="auto"
+                  >
+                  </v-text-field>
+                </v-col>
+                <v-col col="12" sm="6" md="3">
+                  <v-menu
+                    v-model="cal_menu2"
+                    :close-on-content-click="false"
+                    :nudge-right="40"
+                    transition="scale-transition"
+                    offset-y
+                    min-width="290px"
+                  >
+                    <template v-slot:activator="{on}">
+                      <v-text-field
+                        v-model="moving_date"
+                        label="이사 예정일"
+                        prepend-icon="event"
+                        readonly
+                        v-on="on"
+                      ></v-text-field>
+                    </template>
+                    <v-date-picker
+                      :day-format="date=>date.split('-')[2]"
+                      locale="kr"
+                      v-model="moving_date"
+                      @input="cal_menu2=false"
+                    ></v-date-picker>
+                  </v-menu>
+                </v-col>
+                <v-col cols="12" sm="6" md="3">
+                  <v-autocomplete
+                    v-model="move_category"
+                    :items="MOVE_CATEGORY_LIST"
+                    item-text="text"
+                    item-value="value"
+                    chips
+                    label="이사종류(포장, 일반이사 등)*"
+                    hide-details="auto"
+                  ></v-autocomplete>
+                </v-col>
+              </v-row>              
+            </v-card>
+            <v-row class="ma-2" justify="end">
+              <v-btn
+                @click="validate(); nextStep(index+1)"
+              >{{$t('next')}}</v-btn>
+            </v-row>            
+          </v-stepper-content>
+        </template>
+      </v-stepper-items>
+    </v-stepper>
     <v-container class="ma">
       <v-form @submit.prevent="onSubmit">
-        <div class="headline mb-10">집구하기 부터 이사까지 한번에!</div>
-        <div class="subtitle">기본정보</div>
-        <v-row>
-          <v-col cols="12" sm="12" md="6">
-            <v-select
-              @change="prosChange"
-              v-model="pros_category"
-              :items="PROS_CATEGORY_LIST"
-              multiple
-              chips
-              deletable-chips
-              label="필요업무(중개,법무사,가구구매 등)*"
-            ></v-select>
-          </v-col>
-          <v-col
-            v-show="multiIncludes(pros_category, ['REB','TAX','RES','LAW'])"
-            cols="12"
-            sm="6"
-            md="3"
-          >
-            <v-select
-              @change="transactionChange"
-              v-model="transaction_category"
-              :items="TRANSACTION_CATEGORY_LIST"
-              item-text="text"
-              item-value="value"
-              chips
-              label="거래종류(매매,전세,월세 등)*"
-            ></v-select>
-          </v-col>
-          <v-col cols="12" sm="6" md="3">
-            <v-select
-              v-model="item_category"
-              :items="item_category_list"
-              item-text="text"
-              item-value="value"
-              chips
-              label="물건종류(원룸,아파트,주택 등)*"
-            ></v-select>
-          </v-col>
-        </v-row>
-        <div class="subtitle">부동산 조건 정보</div>
-        <v-row>
-          <v-col
-            v-show="!multiIncludes(item_category, ['LND'])"
-            cols="12"
-            sm="3"
-            md="2">
-            <v-text-field v-model="building_area" label="건물면적(㎡)"></v-text-field>
-          </v-col>
-          <v-col
-            v-show=" multiIncludes(item_category, ['LND']) || (transaction_category=='TR' && multiIncludes(item_category, ['ONR','HOS','CMH','LND'])) "
-            cols="12"
-            sm="3"
-            md="2"
-          >
-            <v-text-field v-model="land_area" label="토지면적(㎡)"></v-text-field>
-          </v-col>
-          <v-col v-if="transaction_category=='TR'" cols="12" sm="3" md="2">
-            <v-text-field v-model="trade_price" label="매매가"></v-text-field>
-          </v-col>
-          <v-col
-            v-else-if="transaction_category=='DL' || transaction_category=='RT'"
-            cols="12"
-            sm="3"
-            md="2"
-          >
-            <v-text-field v-model="deposit" label="보증금" required></v-text-field>
-          </v-col>
-          <v-col v-if="transaction_category=='RT'" cols="12" sm="3" md="2">
-            <v-text-field v-model="monthly_fee" label="월세*" required></v-text-field>
-          </v-col>
-        </v-row>
-        <div class="subtitle">위치 및 일정 정보</div>
-        <v-row outline>
-          <v-col v-show="multiIncludes(pros_category, ['MOV'])" cols="12" sm="12" md="6">
-            <v-text-field
-              v-model="dep.full_address"
-              label="출발 주소 검색"
-              outlined
-              readonly
-              @click.stop="dep.dialog = true"
-            ></v-text-field>
-            <v-dialog v-model="dep.dialog" :key="dep.daumpostcodeKey">
-              <v-card>
-                <v-card-text class="pt-5">
-                  <vue-daum-postcode v-if="dep.daumpostcodeKey%2==0" @complete="dep.address_objects = $event; dep.address = dep.address_objects.jibunAddress + ' ' + dep.address_objects.buildingName; dep.extra_address=''; dep.daumpostcodeKey+=1"/>
-                  <v-row v-else>
-                    <v-col class="pa-0" cols="12" sm="4">
-                      <v-text-field :value="this.dep.address_objects.zonecode" label="우편번호" outlined readonly></v-text-field>
-                    </v-col>
-                    <v-col class="pa-0" cols="12" lg="12">
-                      <v-text-field v-model="dep.address" outlined></v-text-field>
-                    </v-col>
-                    <v-text-field
-                      label="나머지 주소 입력"
-                      v-model="dep.extra_address"
-                      outlined
-                    ></v-text-field>
-                    <v-btn @click.prevent="onSubmitAddress(1)">확인</v-btn>
-                  </v-row>
-                </v-card-text>
-              </v-card>
-            </v-dialog>
-          </v-col>
-          <v-col
-            v-show="multiIncludes(pros_category, ['REB','TAX','RES','LAW','INR','CLN', 'MOV', 'PRC'])"
-            cols="12"
-            sm="12"
-            md="6"
-          >
-            <v-text-field
-              v-if="multiIncludes(pros_category, ['MOV'])"
-              v-model="arv.full_address"
-              label="대상(도착) 주소 검색"
-              outlined
-              readonly
-              @click.stop="arv.dialog = true"
-            ></v-text-field>
-            <v-text-field
-              v-else-if="multiIncludes(pros_category, ['TAX','RES','LAW','INR','CLN', 'PRC'])"
-              v-model="arv.full_address"
-              label="대상 주소 검색"
-              outlined
-              readonly
-              @click.stop="arv.dialog = true"
-            ></v-text-field>
-            <v-text-field
-              v-else
-              v-model="arv.address"
-              label="입주 희망 지역 검색"
-              outlined
-              readonly
-              @click.stop="arv.dialog = true"
-            ></v-text-field>
-            <v-dialog v-model="arv.dialog" :key="arv.daumpostcodeKey">
-              <v-card>
-                <v-card-text v-if="multiIncludes(pros_category, ['REB'])" class="pt-5">
-                  <v-row>
-                    <v-col cols="12" xs="12" md="3">
-                      <v-select label="시도"></v-select>
-                    </v-col>
-                    <v-col cols="12" xs="12" md="3">
-                      <v-select label="시군구"></v-select>
-                    </v-col>
-                    <v-col cols="12" xs="12" md="3">
-                      <v-select label="읍면동"></v-select>
-                    </v-col>
-                    <v-col v-if="multiIncludes(pros_category, ['MOV'])" cols="12" xs="12" md="3">
-                      <v-select label="층"></v-select>
-                    </v-col>
-                  </v-row>
-                </v-card-text>
-                <v-card-text v-else class="pt-5">
-                  <vue-daum-postcode v-if="arv.daumpostcodeKey%2==0" @complete="arv.address_objects = $event; arv.address = arv.address_objects.jibunAddress + ' ' + arv.address_objects.buildingName; arv.extra_address=''; arv.daumpostcodeKey+=1"/>
-                  <v-row v-else>
-                    <v-col class="pa-0" cols="12" sm="4">
-                      <v-text-field :value="this.arv.address_objects.zonecode" label="우편번호" outlined readonly></v-text-field>
-                    </v-col>
-                    <v-col class="pa-0" cols="12" lg="12">
-                      <v-text-field v-model="arv.address" outlined></v-text-field>
-                    </v-col>
-                    <v-text-field
-                      label="나머지 주소 입력"
-                      v-model="arv.extra_address"
-                      outlined
-                    ></v-text-field>
-                    <v-btn @click.prevent="onSubmitAddress(2)">확인</v-btn>
-                  </v-row>
-                </v-card-text>
-              </v-card>
-            </v-dialog>
-          </v-col>
-          <v-col v-show="multiIncludes(pros_category, ['MOV'])" col="12" sm="6" md="3">
-            <v-menu
-              v-model="menu"
-              :close-on-content-click="false"
-              :nudge-right="40"
-              transition="scale-transition"
-              offset-y
-              min-width="290px"
-            >
-              <template v-slot:activator="{on}">
-                <v-text-field
-                  v-model="moving_date"
-                  label="이사 예정일"
-                  prepend-icon="event"
-                  readonly
-                  v-on="on"
-                ></v-text-field>
-              </template>
-              <v-date-picker
-                :day-format="date=>date.split('-')[2]"
-                locale="kr"
-                v-model="moving_date"
-                @input="menu=false"
-              ></v-date-picker>
-            </v-menu>
-          </v-col>
-        </v-row>
-        <v-textarea
-          v-model="etc"
-          class="form-control mt-5"
-          :label="$t('message.etc')"
-          placeholder="요청시 상세한 사항을 추가로 입력 해주세요. (입주 희망 아파트명, 세부지역, 세부조건 등)"
-          auto-grow
-          outlined
-        ></v-textarea>
-        <v-btn type="submit" color="primary" absolute>제출</v-btn>
+        <v-btn type="submit" color="primary" absolute :disabled="invalid || !validated">제출</v-btn>
       </v-form>
     </v-container>
   </div>
+  </ValidationObserver>
 </template>
 <script>
 import { apiService } from "../common/api.service.js";
+import AddressSearchComponent from "@/components/AddressSearch.vue"
 import { constants } from "@/components/mixins/constants.js";
+import {
+  ValidationObserver,
+  ValidationProvider,
+} from "vee-validate";
+// import { CSRF_TOKEN } from '../common/csrf_token';
 // import VueDaumPostcode from "vue-daum-postcode"
 
 export default {
@@ -229,26 +294,34 @@ export default {
       required: false
     }
   },
+  components: {
+    AddressSearchComponent,
+    ValidationProvider,
+    ValidationObserver
+  },
   data() {
     return {
-      arv:{
-        daumpostcodeKey:0,
+      arv:{        
         address_objects: "",
-        full_address:"",
-        address:"",
+        full_address: "",
+        address: "",
         extra_address: "",
-        dialog: false,
       },
       dep:{
-        daumpostcodeKey:0,
         address_objects: "",
-        full_address:"",
-        address:"",
+        full_address: "",
+        address: "",
         extra_address: "",
-        dialog: false,
       },
-      menu: false,
-      item_category_list: [],
+      e1:0,
+      address_dialog: false,
+      address_key: 0,
+      mandatory_input_rule: [[]],
+      location_dialog: false,
+      location_key: 0,
+      floor_select: null,
+      cal_menu: false,
+      cal_menu2: false,
       land_area: 0,
       building_area: 0,
       trade_price: 0,
@@ -256,10 +329,12 @@ export default {
       monthly_fee: 0,
       etc: null,
       end_date: null,
-      moving_date: null,
+      move_category: null,
+      move_date: null,
       item_category: null,
       transaction_category: null,
       pros_category: ["REB", "MOV"],
+      searchInput: null,
       error: null,
       moment: null
     };
@@ -281,19 +356,17 @@ export default {
       }
       return false;
     },
-    prosChange() {
-      console.log(this);
-    },
-    transactionChange() {
-      console.log(this.item_category_list);
-      if (this.transaction_category == "TR") {
-        console.log("tr");
-        console.log(this.item_category_list.splice(1, 3));
+    nextStep (n) {
+      console.log(n)
+      if (n === this.pros_category.length) {
+        this.e1 = 0
       } else {
-        this.item_category_list = JSON.parse(
-          JSON.stringify(this.ITEM_CATEGORY_LIST)
-        );
+        this.e1 = n + 1
       }
+    },
+    prosChange() {
+      this.pros_category.sort((a,b)=>(this.PROS_CATEGORY_ORDER[a] - this.PROS_CATEGORY_ORDER[b]))
+      console.log(this.pros_category);
     },
     handleAddress(data) {
       // this.fullAddress = data.address;
@@ -319,14 +392,12 @@ export default {
       //1:Departure address. 2:Arriving address. 3:Departure address partially.
       if(flag==1){
         this.dep.full_address = this.dep.address + " " + this.dep.extra_address
-        this.dep.dialog = false
-        this.dep.daumpostcodeKey+=1      
+        this.address_dialog = false
+        this.address_key += 1
       } else if(flag==2) {
         this.arv.full_address = this.arv.address + " " + this.arv.extra_address
-        this.arv.dialog = false
-        this.arv.daumpostcodeKey+=1
-      } else {
-        console.log('3')
+        this.address_dialog = false
+        this.address_key += 1
       }
     },
     onSubmit() {
@@ -343,7 +414,7 @@ export default {
         apiService(endpoint, method, {
           etc: this.etc,
           end_date: this.end_date,
-          moving_date: this.moving_date,
+          move_date: this.move_date,
           transaction_category: this.transaction_category,
           item_category: this.item_category,
           pros_category: this.pros_category,
@@ -359,8 +430,8 @@ export default {
       }
     }
   },
-  async beforeRouteEnter(to, from, next) {
-    if (to.params.id !== undefined) {
+  async beforeRouteEnter(to, from, next) {   
+      if (to.params.id !== undefined) {
       let endpoint = `/api/questions/${to.params.id}/`;
       let data = await apiService(endpoint);
       return next(
@@ -382,14 +453,18 @@ export default {
   },
   created() {
     document.title = "요청서 작성하기";
-    this.item_category_list = JSON.parse(
-      JSON.stringify(this.ITEM_CATEGORY_LIST)
-    );
-    // this.end_date = '1900-01-01'
-    // this.moving_date ='1900-01-01'
     this.end_date = this.$moment()
       .add(7, "days")
       .format("YYYY-MM-DD");
+    this.moving_date = this.$moment()
+    .add(30, "days")
+    .format("YYYY-MM-DD");
   }
 };
 </script>
+
+<style scoped>
+.theme--light.v-card.v-card--outlined {
+  border: rgba(0, 0, 0, 0) !important;
+}
+</style>

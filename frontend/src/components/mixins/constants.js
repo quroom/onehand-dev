@@ -1,3 +1,5 @@
+import {i18n} from '@/plugins/i18n';
+
 export const constants = {
   data() {
     return {
@@ -19,22 +21,40 @@ export const constants = {
         'TR': "매매",
         'DL': "전세",
         'RT': "월세",
-        'EX': "교환",
+        // 'EX': "교환",
         'CS': "상담"
       },
       PROS_CATEGORY: {
-        'REB': "중개",
-        'TAX': "세무",
-        'RES': "등기",
-        'LAW': "법률",
+        'REB': i18n.t("brokerage"),
+        // 'TAX': "세무",
+        // 'RES': "등기",
+        // 'LAW': "법률",
         // 'LON': "대출",
-        'INR': "인테리어",
-        'CLN': "청소",
-        'MOV': "이사",
-        'PRC': "입주사전점검"
+        // 'INR': "인테리어",
+        // 'CLN': "청소",
+        'MOV': i18n.t("move"),
+        // 'PRC': "입주사전점검",
         // 'HAP': "가전구매",
         // 'FRP': "가구구매"
       },
+      PROS_CATEGORY_ORDER: {
+        'REB': 1,
+        'TAX': 2,
+        'RES': 3,
+        'LAW': 4,
+        'LON': 5,
+        'INR': 6,
+        'CLN': 7,
+        'MOV': 8,
+        'PRC': 10,
+        'HAP': 11,
+        'FRP': 12
+      },
+      MOVE_CATEGORY_LIST: [
+        { value: 'PMV', text: '포장이사'},
+        { value: 'HMV', text: '반포장이사'},
+        { value: 'NMV', text: '일반이사'},
+      ],
       ITEM_CATEGORY_LIST: [
         { value: 'ONR', text: "원룸" },
         { value: 'TWR', text: "투룸" },
@@ -51,23 +71,31 @@ export const constants = {
       ],
       TRANSACTION_CATEGORY_LIST: [
         { value: 'TR', text: "매매" },
-        { value: 'DL', text: "전세" },
         { value: 'RT', text: "월세" },
-        { value: 'EX', text: "교환" },
+        { value: 'DL', text: "전세" },
+        // { value: 'EX', text: "교환" },
         { value: 'CS', text: "상담" }
       ],
       PROS_CATEGORY_LIST: [
-        { value: 'REB', text: "중개" },
-        { value: 'TAX', text: "세무" },
-        { value: 'RES', text: "등기" },
-        { value: 'LAW', text: "법률" },
+        { value: 'REB', text: i18n.t("brokerage") },
+        // { value: 'TAX', text: "세무" },
+        // { value: 'RES', text: "등기" },
+        // { value: 'LAW', text: "법률" },
         // { value: 'LON', text: "대출" },
-        { value: 'INR', text: "인테리어" },
-        { value: 'CLN', text: "청소" },
-        { value: 'MOV', text: "이사" },
-        { value: 'PRC', text: "입주사전점검" },
+        // { value: 'INR', text: "인테리어" },
+        // { value: 'CLN', text: "청소" },
+        { value: 'MOV', text: i18n.t("move") },
+        // { value: 'PRC', text: "입주사전점검" },
         // { value: 'HAP', text: "가전구매" },
         // { value: 'FRP', text: "가구구매" }
+      ],
+      FLOOR_LIST: [
+        { value: 0, text: "상관없음" },
+        { value: 1, text: "1층" },
+        { value: 2, text: "저층" },
+        { value: 3, text: "로얄층" },
+        { value: 4, text: "고층" },
+        { value: 5, text: "탑층" }
       ]
     };
   }
