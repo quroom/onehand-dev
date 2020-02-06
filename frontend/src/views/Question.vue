@@ -1,6 +1,7 @@
 <template>
   <div class="ma-5">
     <v-container class="my-5">
+      <div class="headline mb-10 ml-5">집구하기 부터 이사까지 한번에!</div>
       <v-row>
         <v-col class="pb-0" cols="12" xs="12" md="4">
           <v-icon left color="blue">mdi-account</v-icon>
@@ -30,6 +31,18 @@
         </v-col>
       </v-row>
       <v-divider></v-divider>
+      <v-stepper v-model="e1">
+        <v-stepper-header>
+          <v-stepper-step key="0-step" :step="0" :complete="e1>0">{{$t('all')}}{{$t('info')}}</v-stepper-step>
+          <template v-for="(key, index) in question.pros_category">
+            <v-stepper-step
+              :key="`${index+1}-step`"
+              :step="index+1"
+              :complete="e1>index+1"
+            >{{PROS_CATEGORY[key]}}</v-stepper-step>
+          </template>
+        </v-stepper-header>
+      </v-stepper>
       <div class="subtitle mt-5">부동산 조건 정보</div>
       <v-row>
         <v-col
@@ -143,6 +156,7 @@ export default {
   },
   data() {
     return {
+      e1: 0,
       question: {},
       answers: [],
       newAnswerBody: null,
@@ -186,6 +200,8 @@ export default {
     getQuestionData() {
       let endpoint = `/api/questions/${this.id}/`;
       apiService(endpoint).then(data => {
+        //Sort for pros_category
+        data.pros_category.sort((a, b) => this.PROS_CATEGORY_ORDER[a] - this.PROS_CATEGORY_ORDER[b]);
         this.question = data;
         this.userHasAnswered = data.user_has_answered;
         this.setPageTitle(data.etc);

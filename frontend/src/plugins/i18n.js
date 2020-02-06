@@ -9,6 +9,7 @@ const i18n = new VueI18n({
   locale: "ko",
   messages: {
     en: {
+    all: 'all',
     back: 'back',
     basic: 'Basic',
     brokerage: 'brokerage',
@@ -22,6 +23,7 @@ const i18n = new VueI18n({
     validation: en.messages
   },
     ko: {
+      all: '모든',
       back: '뒤로',
       basic: '필수',
       brokerage: '중개',

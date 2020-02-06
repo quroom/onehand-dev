@@ -356,10 +356,8 @@ export default {
       }
     },
     prosChange() {
-      this.pros_category.sort(
-        (a, b) => this.PROS_CATEGORY_ORDER[a] - this.PROS_CATEGORY_ORDER[b]
-      );
-      console.log(this.pros_category);
+      //Sort for pros_category
+      this.pros_category.sort((a, b) => this.PROS_CATEGORY_ORDER[a] - this.PROS_CATEGORY_ORDER[b]);
     },
     handleAddress(data) {
       // this.fullAddress = data.address;

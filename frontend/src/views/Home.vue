@@ -124,6 +124,10 @@ export default {
       }
       this.loadingQuestions = true;
       apiService(endpoint).then(data => {
+        for(var i=0; i<data.results.length; i++){
+          console.log(data.results[i])
+          data.results[i].pros_category.sort((a, b) => this.PROS_CATEGORY_ORDER[a] - this.PROS_CATEGORY_ORDER[b]);
+        }
         this.questions.push(...data.results);
         this.loadingQuestions = false;
         if (data.next) {
