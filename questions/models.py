@@ -65,7 +65,7 @@ class Question(models.Model):
     building_area = models.IntegerField(default=0)
     from_location = models.CharField(max_length=100, blank=True)
     monthly_fee = models.IntegerField(default=0)
-    moving_date = models.DateField(blank=True, null=True)
+    move_date = models.DateField(blank=True, null=True)
     pros_category = MultiSelectField(choices=PROS_CATEGORY, default='NA')
     to_location = models.CharField(max_length=100, blank=True)
     transaction_category = models.CharField(max_length=2, choices=TRANSACTION_CATEGORY, default='NA')

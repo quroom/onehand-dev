@@ -7,7 +7,7 @@ class QuestionSerializer(serializers.ModelSerializer):
     created_at = serializers.SerializerMethodField()
     answers_count = serializers.SerializerMethodField()
     end_date = serializers.DateField()
-    moving_date = serializers.DateField()
+    move_date = serializers.DateField()
     user_has_answered = serializers.SerializerMethodField()
     transaction_category = serializers.ChoiceField(choices=TRANSACTION_CATEGORY)
     item_category = serializers.ChoiceField(choices=ITEM_CATEGORY)
