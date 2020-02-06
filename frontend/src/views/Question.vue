@@ -40,7 +40,7 @@
             <v-text-field v-model="question.building_area" label="건물면적(㎡)" readonly></v-text-field>
           </v-col>
           <v-col
-            v-show=" multiIncludes(question.item_category, ['LND']) || (question.transaction_category=='TR' && multiIncludes(item_category, ['ONR','HOS','CMH','LND'])) "
+            v-show=" multiIncludes(question.item_category, ['LND']) || (question.transaction_category=='TR' && multiIncludes(question.item_category, ['ONR','HOS','CMH','LND'])) "
             cols="12"
             sm="3"
             md="2"

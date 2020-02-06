@@ -1,5 +1,5 @@
 <template>
-  <v-row class="ml-0" align="center" @click.stop="button ? null : flag ? dialog = true : dialog2 = true">
+  <v-row class="ma-0" align="center" @click.stop="button ? null : flag ? dialog = true : dialog2 = true ">
     <v-text-field
       v-model="full_address"
       :label="label"
@@ -11,19 +11,22 @@
       v-if="button"
       class="ml-5"
       @click.stop="dialog = true">
-        상세주소로 검색
+        상세주소 검색
     </v-btn>
     <v-btn
       v-if="button"
       class="ml-5"
       @click.stop="dialog2 = true">
-        지역으로 검색
+        지역 검색
     </v-btn>
     <v-dialog v-model="dialog">
       <v-card>
         <v-card-text class="pt-5">
           <vue-daum-postcode v-if="key%2==0" @complete="address_objects = $event; address = address_objects.jibunAddress + ' ' + address_objects.buildingName; extra_address=''; key+=1"/>
           <v-row v-else>
+            <v-col cols="12" xs="12">
+              <v-btn @click="key-=1">&lt; 주소 재검색</v-btn>
+            </v-col>
             <v-col class="pa-0" cols="12" sm="4">
               <v-text-field :value="this.address_objects.zonecode" label="우편번호" outlined readonly></v-text-field>
             </v-col>
@@ -96,7 +99,8 @@ export default {
   props: {
     flag: {
       type: Boolean,
-      required: false
+      required: false,
+      default: true
     },
     label: {
       type: String,
@@ -130,11 +134,12 @@ export default {
       console.log("onSubmit")
       if(flag==1){
         this.full_address = this.address + " " + this.extra_address;
-        this.$emit('update:address', this.address_objects)
+        this.$emit('update:address', this.full_address)
         this.dialog=false
         this.key+=1
       } else if(flag==2) {
         this.full_address = this.sido_select + " " + this.sigungu_select + " " + this.eupmyundong_select + " " + this.floor_select
+        this.$emit('update:address', this.full_address)
         this.dialog2 = false
         console.log(this.address)
       } else {
@@ -183,8 +188,9 @@ export default {
       }
     }
   },
-  created() {    
-    if(this.flag == false){      
+  created() {
+    console.log("AddressSearchComponent",this)
+    if(this.flag == false || this.button ){
       let endpoint = "/api/locationlist/sido/";
       apiService2(endpoint).then(data => { 
         let json = convert.xml2json(data, {compact:true, ignoreComment:true})
