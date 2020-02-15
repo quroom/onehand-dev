@@ -14,26 +14,29 @@
         </v-col>
         <v-col class="pt-0" cols="12" xs="12" md="12">
           <v-row>
-            <v-subheader>
-              필요업무
-            </v-subheader>
+            <v-subheader>필요업무</v-subheader>
             <div class="mt-2">
-              <v-chip class="mr-2" color="green" text-color="white" v-for="pro in question.pros_category" :key="pro">
-                {{ PROS_CATEGORY[pro] }}
-              </v-chip>
+              <v-chip
+                class="mr-2"
+                color="green"
+                text-color="white"
+                v-for="pro in question.pros_category"
+                :key="pro"
+              >{{ PROS_CATEGORY[pro] }}</v-chip>
             </div>
-            <v-subheader class="ml-4">
-              물건정보
-            </v-subheader>
+            <v-subheader class="ml-4">물건정보</v-subheader>
             <v-chip class="mt-2" color="primary">{{ ITEM_CATEGORY[question.item_category] }}</v-chip>
-            <v-chip class="mt-2 ml-2" color="primary">{{ TRANSACTION_CATEGORY[question.transaction_category] }}</v-chip>
+            <v-chip
+              class="mt-2 ml-2"
+              color="primary"
+            >{{ TRANSACTION_CATEGORY[question.transaction_category] }}</v-chip>
           </v-row>
         </v-col>
       </v-row>
       <v-divider></v-divider>
       <v-stepper v-model="e1">
         <v-stepper-header>
-          <v-stepper-step key="0-step" :step="0" :complete="e1>0">{{$t('all')}}{{$t('info')}}</v-stepper-step>
+          <v-stepper-step key="0-step" :step="0" :complete="e1>0">{{$t('all')}} {{$t('info')}}</v-stepper-step>
           <template v-for="(key, index) in question.pros_category">
             <v-stepper-step
               :key="`${index+1}-step`"
@@ -42,42 +45,48 @@
             >{{PROS_CATEGORY[key]}}</v-stepper-step>
           </template>
         </v-stepper-header>
+        <v-stepper-items>
+          <v-stepper-content :key="`0-content`" :step="0">
+            <v-card class="mx-auto">
+              <v-row>
+                <v-col cols="12" sm="12" md="12">
+                  <div class="subtitle">부동산 조건 정보</div>
+                </v-col>
+              </v-row>
+            </v-card>
+          </v-stepper-content>
+        </v-stepper-items>
       </v-stepper>
       <div class="subtitle mt-5">부동산 조건 정보</div>
       <v-row>
+        <v-col v-show="!multiIncludes(question.item_category, ['LND'])" cols="12" sm="3" md="2">
+          <v-text-field v-model="question.building_area" label="건물면적(㎡)" readonly></v-text-field>
+        </v-col>
         <v-col
-            v-show="!multiIncludes(question.item_category, ['LND'])"
-            cols="12"
-            sm="3"
-            md="2">
-            <v-text-field v-model="question.building_area" label="건물면적(㎡)" readonly></v-text-field>
-          </v-col>
-          <v-col
-            v-show=" multiIncludes(question.item_category, ['LND']) || (question.transaction_category=='TR' && multiIncludes(question.item_category, ['ONR','HOS','CMH','LND'])) "
-            cols="12"
-            sm="3"
-            md="2"
-          >
-            <v-text-field v-model="question.land_area" label="토지면적(㎡)" readonly></v-text-field>
-          </v-col>
-          <v-col v-if="question.transaction_category=='TR'" cols="12" sm="3" md="2">
-            <v-text-field v-model="question.trade_price" label="매매가" readonly></v-text-field>
-          </v-col>
-          <v-col
-            v-else-if="question.transaction_category=='DL' || question.transaction_category=='RT'"
-            cols="12"
-            sm="3"
-            md="2"
-          >
-            <v-text-field v-model="question.deposit" label="보증금" readonly></v-text-field>
-          </v-col>
-          <v-col v-if="question.transaction_category=='RT'" cols="12" sm="3" md="2" readonly>
-            <v-text-field v-model="question.monthly_fee" label="월세*" readonly></v-text-field>
-          </v-col>
+          v-show=" multiIncludes(question.item_category, ['LND']) || (question.transaction_category=='TR' && multiIncludes(question.item_category, ['ONR','HOS','CMH','LND'])) "
+          cols="12"
+          sm="3"
+          md="2"
+        >
+          <v-text-field v-model="question.land_area" label="토지면적(㎡)" readonly></v-text-field>
+        </v-col>
+        <v-col v-if="question.transaction_category=='TR'" cols="12" sm="3" md="2">
+          <v-text-field v-model="question.trade_price" label="매매가" readonly></v-text-field>
+        </v-col>
+        <v-col
+          v-else-if="question.transaction_category=='DL' || question.transaction_category=='RT'"
+          cols="12"
+          sm="3"
+          md="2"
+        >
+          <v-text-field v-model="question.deposit" label="보증금" readonly></v-text-field>
+        </v-col>
+        <v-col v-if="question.transaction_category=='RT'" cols="12" sm="3" md="2" readonly>
+          <v-text-field v-model="question.monthly_fee" label="월세*" readonly></v-text-field>
+        </v-col>
       </v-row>
       <div class="subtitle">위치 및 일정 정보</div>
-      <v-row outline>
-      </v-row>
+      <v-row outline></v-row>
       <v-row class="mb-0">
         <v-col class="pb-0" cols="12">
           <v-textarea label="기타요청사항" v-model="question.etc" auto-grow outlined readonly></v-textarea>
@@ -140,7 +149,7 @@ import { apiService } from "../common/api.service.js";
 import AnswerComponent from "@/components/Answer.vue";
 import QuestionActions from "@/components/QuestionActions.vue";
 import { constants } from "@/components/mixins/constants.js";
-import { getCookie } from "../common/get_cookie.js"
+import { getCookie } from "../common/get_cookie.js";
 export default {
   mixins: [constants],
   name: "Question",
@@ -165,7 +174,7 @@ export default {
       showForm: false,
       next: null,
       loadingAnswers: false,
-      requestUser: null,
+      requestUser: null
     };
   },
   computed: {
@@ -190,7 +199,7 @@ export default {
       }
       return false;
     },
-    getCookie:getCookie,
+    getCookie: getCookie,
     setPageTitle(title) {
       document.title = title;
     },
@@ -201,7 +210,9 @@ export default {
       let endpoint = `/api/questions/${this.id}/`;
       apiService(endpoint).then(data => {
         //Sort for pros_category
-        data.pros_category.sort((a, b) => this.PROS_CATEGORY_ORDER[a] - this.PROS_CATEGORY_ORDER[b]);
+        data.pros_category.sort(
+          (a, b) => this.PROS_CATEGORY_ORDER[a] - this.PROS_CATEGORY_ORDER[b]
+        );
         this.question = data;
         this.userHasAnswered = data.user_has_answered;
         this.setPageTitle(data.etc);
@@ -254,9 +265,9 @@ export default {
     }
   },
   created() {
-    if(!getCookie('islogin')){
-      window.location.href='/accounts/login/'
-    }else{
+    if (!getCookie("islogin")) {
+      window.location.href = "/accounts/login/";
+    } else {
       this.getQuestionData();
       this.getQuestionAnswers();
       this.setRequestUser();
